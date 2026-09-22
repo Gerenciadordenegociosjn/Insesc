@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Inter:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin "@tailwindcss/typography";
@@ -55,87 +55,85 @@
 }
 
 :root {
-  --background: 42 38% 94%;
-  --foreground: 184 18% 17%;
-  --border: 156 11% 90%;
-  --input: 156 11% 90%;
-  --ring: 185 73% 22%;
+  --background: 0 0% 99%;
+  --foreground: 201 50% 15%;
+  --border: 201 20% 90%;
+  --input: 201 20% 90%;
+  --ring: 165 94% 25%;
 
   --card: 0 0% 100%;
-  --card-foreground: 184 18% 17%;
-  --card-border: 156 11% 90%;
+  --card-foreground: 201 50% 15%;
+  --card-border: 201 20% 92%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 184 18% 17%;
-  --popover-border: 156 11% 90%;
+  --popover-foreground: 201 50% 15%;
+  --popover-border: 201 20% 90%;
 
-  --primary: 185 73% 22%;
+  --primary: 201 100% 35%;
   --primary-foreground: 0 0% 100%;
-  --primary-border: hsl(185 73% 18%);
+  --primary-border: hsl(201 100% 30%);
 
-  --secondary: 42 79% 50%;
-  --secondary-foreground: 186 76% 15%;
-  --secondary-border: hsl(42 79% 45%);
+  --secondary: 165 94% 25%;
+  --secondary-foreground: 0 0% 100%;
+  --secondary-border: hsl(165 94% 20%);
 
-  --muted: 184 15% 90%;
-  --muted-foreground: 184 8% 44%;
-  --muted-border: 156 11% 90%;
+  --muted: 201 20% 94%;
+  --muted-foreground: 201 20% 45%;
+  --muted-border: 201 20% 90%;
 
-  --accent: 42 79% 50%;
-  --accent-foreground: 186 76% 15%;
-  --accent-border: hsl(42 79% 45%);
+  --accent: 185 100% 25%;
+  --accent-foreground: 0 0% 100%;
+  --accent-border: hsl(185 100% 20%);
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --destructive-border: hsl(0 84% 50%);
 
-  --success: 156 60% 34%;
+  --success: 165 94% 25%;
   --success-foreground: 0 0% 100%;
 
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-display: 'Outfit', sans-serif;
-  --app-font-serif: Georgia, serif;
-  --app-font-mono: Menlo, monospace;
+  --app-font-sans: 'Bricolage Grotesque', sans-serif;
+  --app-font-display: 'Bricolage Grotesque', sans-serif;
   
-  --radius: 1.125rem; /* 18px */
+  --radius: 1rem;
 }
 
 .dark {
-  --background: 186 76% 10%;
-  --foreground: 42 38% 94%;
-  --border: 185 73% 22%;
-  --input: 185 73% 22%;
-  --ring: 42 79% 50%;
+  --background: 201 50% 5%;
+  --foreground: 0 0% 98%;
+  --border: 201 30% 18%;
+  --input: 201 30% 18%;
+  --ring: 165 94% 35%;
 
-  --card: 186 76% 13%;
-  --card-foreground: 42 38% 94%;
-  --card-border: 185 73% 22%;
+  --card: 201 50% 7%;
+  --card-foreground: 0 0% 98%;
+  --card-border: 201 30% 15%;
 
-  --popover: 186 76% 13%;
-  --popover-foreground: 42 38% 94%;
-  --popover-border: 185 73% 22%;
+  --popover: 201 50% 7%;
+  --popover-foreground: 0 0% 98%;
+  --popover-border: 201 30% 18%;
 
-  --primary: 42 79% 50%;
-  --primary-foreground: 186 76% 15%;
-  --primary-border: hsl(42 79% 45%);
+  --primary: 201 90% 45%;
+  --primary-foreground: 0 0% 100%;
+  --primary-border: hsl(201 90% 40%);
 
-  --secondary: 185 73% 22%;
+  --secondary: 165 90% 35%;
   --secondary-foreground: 0 0% 100%;
-  --secondary-border: hsl(185 73% 18%);
+  --secondary-border: hsl(165 90% 30%);
 
-  --muted: 186 76% 15%;
-  --muted-foreground: 184 8% 60%;
-  --muted-border: 185 73% 22%;
+  --muted: 201 30% 15%;
+  --muted-foreground: 201 20% 70%;
+  --muted-border: 201 30% 18%;
 
-  --accent: 185 73% 22%;
+  --accent: 185 90% 35%;
   --accent-foreground: 0 0% 100%;
-  --accent-border: hsl(185 73% 18%);
+  --accent-border: hsl(185 90% 30%);
 
-  --destructive: 0 62% 30%;
+  --destructive: 0 62% 40%;
   --destructive-foreground: 0 0% 100%;
-  --destructive-border: hsl(0 62% 20%);
+  --destructive-border: hsl(0 62% 30%);
   
-  --success: 156 60% 34%;
+  --success: 165 90% 35%;
   --success-foreground: 0 0% 100%;
 }
 
@@ -146,6 +144,14 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  #doacao {
+    scroll-margin-top: 5rem;
   }
 
   h1, h2, h3, h4, h5, h6 {

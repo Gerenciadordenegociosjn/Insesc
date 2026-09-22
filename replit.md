@@ -1,6 +1,6 @@
-# [Project name]
+# INCESC — Doe e Transforme Vidas
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Uma página de doações do INCESC que apresenta sua missão, áreas de impacto e seleção de valor; o pagamento ainda não está conectado.
 
 ## Run & Operate
 
@@ -34,7 +34,8 @@ _Describe the high-level user-facing capabilities of this app once they exist._
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- A comunicação visual deve seguir a marca oficial em https://www.incesc.org.br/ e usar a logo fornecida, sem recoloração ou distorção.
+- Fotos de projetos, relatos, resultados e dados de arrecadação só podem aparecer como fatos quando validados pelo INCESC; não usar imagens geradas como evidência de ações reais.
 
 ## Gotchas
 
