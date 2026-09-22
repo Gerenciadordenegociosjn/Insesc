@@ -1,0 +1,252 @@
+Landing Page de Doação — INCESC
+1. Estrutura recomendada
+Seção 1 — Hero
+Título:
+
+Sua doação transforma possibilidades em novas histórias
+
+Subtítulo:
+
+Educação, saúde, cultura e esporte podem abrir caminhos para pessoas e comunidades em situação de vulnerabilidade. Apoie o INCESC e ajude a construir um futuro mais justo, inclusivo e sustentável.
+
+CTA principal:
+
+Doe agora
+
+Apoio de confiança:
+
+Uma instituição sem fins lucrativos dedicada ao desenvolvimento humano e ao fortalecimento das comunidades.
+
+A página deve começar com uma imagem real de uma ação, projeto ou público atendido pelo instituto. Evite banco de imagens genérico, pois ele reduz a credibilidade.
+
+Seção 2 — A dor e a oportunidade
+Título:
+
+Quando faltam oportunidades, o potencial de uma vida inteira pode permanecer invisível
+
+Texto:
+
+Muitas pessoas ainda enfrentam barreiras para acessar educação, saúde, cultura, esporte e condições dignas de desenvolvimento.
+
+Uma doação não resolve apenas uma necessidade imediata: ela ajuda a criar acesso, estimular talentos, fortalecer vínculos e ampliar as possibilidades de futuro.
+
+Destaques visuais:
+
+Mais acesso ao conhecimento;
+Apoio a comunidades vulneráveis;
+Promoção da saúde e do bem-estar;
+Incentivo à cultura, ao esporte e à cidadania.
+Seção 3 — O impacto da doação
+Título:
+
+Sua contribuição ajuda a transformar intenção em impacto
+
+Use quatro cards curtos, seguindo as áreas apresentadas pelo instituto:  
+Instituto INCESC
+
+Educação
+Amplie o acesso a conhecimentos que abrem portas para novas possibilidades.
+
+Saúde
+Contribua para ações que promovem bem-estar, cuidado e qualidade de vida.
+
+Cultura
+Ajude a valorizar a arte, as histórias, a criatividade e a expressão humana.
+
+Esporte
+Apoie práticas que estimulam saúde, disciplina, integração e desenvolvimento.
+
+CTA secundário:
+
+Quero apoiar essa transformação
+
+Seção 4 — Como sua doação ajuda
+Evite inserir valores ou resultados específicos sem dados oficiais. Use inicialmente uma apresentação flexível:
+
+Título:
+
+Cada contribuição faz parte de algo maior
+
+Texto:
+
+Escolha o valor que melhor representa sua possibilidade hoje. O importante é participar da construção de uma sociedade mais justa e com mais oportunidades para todos.
+
+Botões de valor:
+
+R$ 25
+R$ 50
+R$ 100
+R$ 250
+Outro valor
+CTA:
+
+Continuar para doação
+
+Os valores devem ser vinculados diretamente ao sistema de pagamento, formulário ou chave Pix oficial do instituto.
+
+Seção 5 — Prova social verdadeira
+Como não foram fornecidos depoimentos, vídeos, avaliações ou números oficiais, não é recomendável inventá-los. Essa seção pode ser montada com materiais reais:
+
+Título:
+
+Quem participa também acredita nessa transformação
+
+Inserir:
+
+Um depoimento real de beneficiário;
+Um depoimento de voluntário;
+Um depoimento de parceiro;
+Vídeo curto de uma ação do INCESC;
+Número oficial de pessoas atendidas, projetos realizados ou municípios alcançados, desde que validado pelo instituto.
+Modelo de depoimento:
+
+“O projeto trouxe novas possibilidades para nossa comunidade e mostrou que o acesso ao conhecimento pode transformar trajetórias.”
+
+[Nome real] — [função ou relação com o projeto]
+
+Não utilizar frases atribuídas a pessoas inexistentes.
+
+Seção 6 — Transparência e confiança
+Título:
+
+Doe com confiança
+
+Texto:
+
+O INCESC é uma instituição sem fins lucrativos que atua em iniciativas de interesse comunitário, com ações relacionadas à educação, saúde, cultura, esporte, voluntariado, pesquisa, desenvolvimento social e sustentabilidade.  
+Instituto INCESC
+
+Elementos recomendados:
+
+Link para transparência;
+Política de privacidade;
+Prestação de contas;
+CNPJ institucional;
+Canal oficial de atendimento;
+Informações sobre a destinação dos recursos.
+A referência informa que o instituto possui área de transparência, compliance, comitê de ética e ouvidoria.  
+Instituto INCESC
+
+Seção 7 — CTA final
+Título:
+
+O futuro começa com uma atitude de hoje
+
+Texto:
+
+Apoie o INCESC e contribua para que mais pessoas tenham acesso a oportunidades capazes de transformar suas vidas.
+
+Botão:
+
+Fazer minha doação
+
+Microcopy abaixo do botão:
+
+Sua contribuição será direcionada às ações e projetos do instituto, conforme sua estratégia de atuação e necessidades prioritárias.
+
+Direção visual
+Paleta
+Para manter fidelidade visual, utilize os valores extraídos do site oficial ou do manual da marca. No layout, a aplicação deve seguir esta lógica:
+
+Cor institucional principal: títulos, elementos de marca e fundos de destaque;
+Cor de contraste: botões de doação;
+Fundo claro: leitura e sensação de acolhimento;
+Cor escura neutra: textos e rodapé;
+Cor de apoio: cards, ícones e separadores.
+O botão de doação deve ter contraste suficiente em relação ao fundo, mas ainda pertencer à paleta oficial. Não introduza cores aleatórias apenas para chamar atenção.
+
+Tipografia
+Títulos: tipografia institucional, com peso forte;
+Textos: fonte simples e confortável para leitura em celular;
+Botões: peso semibold ou bold;
+Corpo de texto: tamanho mínimo aproximado de 16 px.
+Imagens
+Priorizar:
+
+Fotografias reais das ações;
+Pessoas em contexto de participação e transformação;
+Diversidade de idade, gênero e território;
+Imagens com boa iluminação e enquadramento humano;
+Compressão para carregamento rápido.
+Wireframe simplificado
+text
+Copiar
+
+[Logo INCESC]                                      [DOAR AGORA]
+
+--------------------------------------------------
+SUA DOAÇÃO TRANSFORMA POSSIBILIDADES
+EM NOVAS HISTÓRIAS
+
+Educação, saúde, cultura e esporte para construir
+um futuro mais justo e inclusivo.
+
+[DOE AGORA]
+Imagem real de projeto ou comunidade
+--------------------------------------------------
+
+QUANDO FALTAM OPORTUNIDADES...
+Texto sobre o problema e a importância da contribuição
+
+[EDUCAÇÃO] [SAÚDE] [CULTURA] [ESPORTE]
+--------------------------------------------------
+
+CADA CONTRIBUIÇÃO FAZ PARTE DE ALGO MAIOR
+
+[R$ 25] [R$ 50] [R$ 100] [R$ 250] [OUTRO VALOR]
+
+[CONTINUAR PARA DOAÇÃO]
+--------------------------------------------------
+
+QUEM PARTICIPA TAMBÉM ACREDITA
+[Vídeo ou depoimentos reais]
+--------------------------------------------------
+
+DOE COM CONFIANÇA
+Transparência | Ética | Prestação de contas
+--------------------------------------------------
+
+O FUTURO COMEÇA COM UMA ATITUDE DE HOJE
+
+[FAZER MINHA DOAÇÃO]
+--------------------------------------------------
+
+Rodapé mínimo:
+Logo | Privacidade | Transparência | Atendimento
+Regras de conversão
+Remover menu de navegação externo;
+Manter apenas o logotipo e, no máximo, um botão fixo “Doar agora”;
+Repetir o CTA após cada bloco importante;
+Usar frases curtas e escaneáveis;
+Exibir o botão de doação acima da primeira dobra;
+Usar CTA fixo no rodapé em telas pequenas;
+Não abrir links institucionais antes da conversão;
+Não apresentar excesso de informações sobre a organização;
+Usar uma única ação principal em toda a página;
+Fazer o botão levar diretamente ao formulário ou meio oficial de doação.
+CTA fixo para celular
+Doe agora e ajude a transformar vidas
+
+O botão deve permanecer visível na parte inferior da tela, sem cobrir textos ou campos de formulário.
+
+Copy final pronta para implementação
+Hero
+Sua doação transforma possibilidades em novas histórias
+
+Educação, saúde, cultura e esporte podem abrir caminhos para pessoas e comunidades em situação de vulnerabilidade. Apoie o INCESC e ajude a construir um futuro mais justo, inclusivo e sustentável.
+
+[Doe agora]
+
+Bloco de impacto
+Uma contribuição hoje pode abrir novas possibilidades amanhã
+
+Quando uma pessoa tem acesso ao conhecimento, ao cuidado, à cultura e ao esporte, ela ganha mais do que uma oportunidade momentânea: ganha condições para desenvolver seu potencial e participar ativamente da sociedade.
+
+Fechamento
+Você pode fazer parte dessa transformação
+
+Não importa o tamanho da contribuição. Cada doação fortalece iniciativas que promovem inclusão, cidadania, desenvolvimento humano e novas oportunidades.
+
+[Fazer minha doação]
+
+A página deve usar apenas informações, depoimentos, números, selos e imagens comprovadamente fornecidos pelo INCESC. Isso protege a credibilidade da campanha e evita uma prova social artificial.
