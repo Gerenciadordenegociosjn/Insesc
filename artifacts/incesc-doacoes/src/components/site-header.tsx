@@ -1,14 +1,9 @@
 import { Link, useLocation } from "wouter";
-import { ArrowUpRight } from "lucide-react";
 import logoUrl from "@/assets/logo.png";
-
-type SiteHeaderProps = {
-  onDonate?: () => void;
-};
 
 const donationUrl = `${import.meta.env.BASE_URL}#doacao`;
 
-export function SiteHeader({ onDonate }: SiteHeaderProps) {
+export function SiteHeader() {
   const [location] = useLocation();
   const navItems = [
     { href: "/transparencia", label: "Portal da transparência", testId: "link-transparency" },
@@ -38,24 +33,6 @@ export function SiteHeader({ onDonate }: SiteHeaderProps) {
             </Link>
           ))}
         </nav>
-        {onDonate ? (
-          <button
-            type="button"
-            onClick={onDonate}
-            data-testid="button-header-donate"
-            className="hidden min-h-10 items-center justify-center rounded-lg bg-secondary px-4 text-sm font-bold text-secondary-foreground hover:bg-secondary/90 sm:inline-flex"
-          >
-            Doe agora
-          </button>
-        ) : (
-          <a
-            href={donationUrl}
-            data-testid="link-header-donate"
-            className="inline-flex min-h-10 items-center justify-center gap-1 rounded-lg bg-secondary px-3 text-xs font-bold text-secondary-foreground hover:bg-secondary/90 sm:px-4 sm:text-sm"
-          >
-            Doe agora <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
-          </a>
-        )}
       </div>
     </header>
   );

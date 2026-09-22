@@ -91,7 +91,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/20 pb-20 lg:pb-0">
-      <SiteHeader onDonate={scrollToDonate} />
+      <SiteHeader />
 
       <main>
         {/* Hero Section */}

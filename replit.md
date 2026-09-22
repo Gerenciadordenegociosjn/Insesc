@@ -36,6 +36,7 @@ _Describe the high-level user-facing capabilities of this app once they exist._
 
 - A comunicação visual deve seguir a marca oficial em https://www.incesc.org.br/ e usar a logo fornecida, sem recoloração ou distorção.
 - Fotos de projetos, relatos, resultados e dados de arrecadação só podem aparecer como fatos quando validados pelo INCESC; não usar imagens geradas como evidência de ações reais.
+- O cabeçalho deve mostrar apenas a logo e os acessos “Portal da transparência” e “Minha jornada”, com os acessos agrupados à direita no desktop e legíveis no celular; “Doe agora” pertence ao corpo da página, não ao topo.
 
 ## Gotchas
 
