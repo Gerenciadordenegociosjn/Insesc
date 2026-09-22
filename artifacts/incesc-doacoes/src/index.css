@@ -151,7 +151,13 @@
   }
 
   #doacao {
-    scroll-margin-top: 5rem;
+    scroll-margin-top: 9rem;
+  }
+
+  @media (min-width: 640px) {
+    #doacao {
+      scroll-margin-top: 5rem;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {

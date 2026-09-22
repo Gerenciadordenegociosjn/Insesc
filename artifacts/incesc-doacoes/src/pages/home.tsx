@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { SiteHeader } from "@/components/site-header";
 import logoUrl from "@/assets/logo.png";
 
 const fadeIn = {
@@ -75,6 +76,12 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (window.location.hash === "#doacao") {
+      requestAnimationFrame(() => document.getElementById("doacao")?.scrollIntoView());
+    }
+  }, []);
+
   const scrollToDonate = () => {
     document.getElementById('doacao')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -84,20 +91,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/20 pb-20 lg:pb-0">
-      {/* Topbar */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md py-4 border-b border-border/50">
-        <div className="container mx-auto px-4 lg:px-8 max-w-6xl flex justify-between items-center gap-4">
-          <Link href="/" className="flex items-center">
-             <img src={logoUrl} alt="INCESC" className="h-8 sm:h-10 w-auto object-contain" />
-          </Link>
-          <Button 
-             className="hidden sm:flex bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold"
-            onClick={scrollToDonate}
-          >
-            Doe agora
-          </Button>
-        </div>
-      </header>
+      <SiteHeader onDonate={scrollToDonate} />
 
       <main>
         {/* Hero Section */}
@@ -358,7 +352,8 @@ export default function Home() {
           <img src={logoUrl} alt="INCESC" className="h-8 w-auto object-contain mx-auto mb-6" />
           <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-muted-foreground mb-6">
             <a href="https://www.incesc.org.br/politica-de-privacidade" className="hover:text-foreground">Privacidade</a>
-            <a href="https://www.incesc.org.br/transparencia" className="hover:text-foreground">Transparência</a>
+            <Link href="/transparencia" data-testid="link-footer-transparency" className="hover:text-foreground">Transparência</Link>
+            <Link href="/minha-jornada" data-testid="link-footer-journey" className="hover:text-foreground">Minha jornada</Link>
             <a href="https://www.incesc.org.br/etica-e-ouvidoria" className="hover:text-foreground">Atendimento</a>
           </div>
            <p className="text-xs text-muted-foreground">Instituto INCESC · CNPJ 49.637.563/0001-84</p>
