@@ -12,13 +12,34 @@ import {
 import { z } from "zod/v4";
 
 export const usersTable = pgTable("users", {
-  id: text("id").primaryKey(), // Clerk user id; never provisioned from an arbitrary public request
+  id: text("id").primaryKey(),
+  username: text("username").notNull().unique(),
   email: text("email"),
   name: text("name"),
   role: text("role").notNull().default("unassigned"),
   active: boolean("active").notNull().default(true),
+  passwordHash: text("password_hash"),
+  passwordChangeRequired: boolean("password_change_required").notNull().default(false),
+  totpSecret: text("totp_secret"),
+  totpLastStep: integer("totp_last_step"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const sessionsTable = pgTable("auth_sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const pendingLoginTable = pgTable("auth_pending_logins", {
+  tokenHash: text("token_hash").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  stage: text("stage").notNull().default("mfa"), // password | mfa
+  totpEnrollmentSecret: text("totp_enrollment_secret"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const donationActionsTable = pgTable("donation_actions", {

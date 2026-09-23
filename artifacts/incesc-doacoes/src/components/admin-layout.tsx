@@ -1,7 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { useUser, SignOutButton } from "@clerk/react";
-import { useMe } from "@/lib/api";
+import { useMe, useLogout } from "@/lib/api";
 import {
   LayoutDashboard,
   HeartHandshake,
@@ -19,12 +18,18 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const [location] = useLocation();
-  const { isLoaded: clerkLoaded, user } = useUser();
-  const { data: me, isLoading: meLoading } = useMe();
+  const [location, setLocation] = useLocation();
+  const { data: me, isLoading: meLoading, error: meError } = useMe();
+  const logout = useLogout();
+  useEffect(() => {
+    if ((meError as { status?: number } | null)?.status === 401) setLocation("/admin/login");
+  }, [meError, setLocation]);
 
-  if (!clerkLoaded || meLoading) {
+  if (meLoading) {
     return <div className="min-h-screen bg-background" />;
+  }
+  if (meError && (meError as { status?: number }).status === 401) {
+    return null;
   }
 
   const staffRoles = ["administrator", "financial", "content", "transparency", "auditor", "support"];
@@ -87,15 +92,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
         <div className="p-4 border-t border-border mt-auto">
           <div className="px-2 mb-4">
-            <p className="text-sm font-bold truncate">{user?.primaryEmailAddress?.emailAddress || 'Admin'}</p>
+             <p className="text-sm font-bold truncate">{me.username || me.email || me.name || 'Admin'}</p>
             <p className="text-xs text-muted-foreground uppercase tracking-wider">{me.role}</p>
           </div>
-          <SignOutButton>
-            <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-destructive rounded-xl px-2">
+           <Button variant="ghost" onClick={() => logout.mutate(undefined, { onSuccess: () => setLocation("/admin/login") })} className="w-full justify-start text-muted-foreground hover:text-destructive rounded-xl px-2">
               <LogOut className="w-5 h-5 mr-3" />
               Sair
             </Button>
-          </SignOutButton>
         </div>
       </aside>
 

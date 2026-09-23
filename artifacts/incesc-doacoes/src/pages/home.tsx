@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "wouter";
-import { useUser } from "@clerk/react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -50,8 +49,6 @@ const categoryIcons: Record<string, any> = {
 
 export default function Home() {
   const { toast } = useToast();
-  const { isSignedIn } = useUser();
-  const [, setLocation] = useLocation();
   const { data: actions = [], isLoading } = usePublicActions();
   const { data: checkoutStatus, isLoading: isLoadingCheckoutStatus } = useCheckoutStatus();
   const createCheckout = useCreateCheckout();
@@ -64,7 +61,6 @@ export default function Home() {
   const [isDonationVisible, setIsDonationVisible] = useState(false);
 
   // New form fields
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(true);
   const [communicationConsent, setCommunicationConsent] = useState<boolean>(false);
 
   const formatCurrency = (val: number) => 
@@ -74,7 +70,6 @@ export default function Home() {
     setSelectedAction(action);
     setSelectedValue(null);
     setCustomValue("");
-    setIsAnonymous(!isSignedIn); // Default to linked if signed in, otherwise anonymous
     setCommunicationConsent(false);
     setIsDonationModalOpen(true);
   };
@@ -105,7 +100,7 @@ export default function Home() {
       { 
         actionId: selectedAction.id, 
         amountCents: Math.round(amount * 100),
-        anonymous: isAnonymous,
+        anonymous: true,
         communicationConsent: communicationConsent
       },
       {
@@ -390,29 +385,10 @@ export default function Home() {
             </div>
 
             <div className="space-y-4 pt-4 border-t border-border text-left">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="anonymous-donation"
-                  className="mt-1 w-4 h-4 rounded border-border"
-                  checked={isAnonymous}
-                  onChange={(e) => {
-                    if (!e.target.checked && !isSignedIn) {
-                      toast({
-                        title: "Login necessário",
-                        description: "Para vincular esta doação ao seu perfil (Minha Jornada), você precisa estar conectado. Faça login primeiro.",
-                      });
-                      setLocation("/sign-in");
-                    } else {
-                      setIsAnonymous(e.target.checked);
-                    }
-                  }}
-                />
-                <label htmlFor="anonymous-donation" className="text-sm leading-snug">
-                  <span className="font-bold block">Doação Anônima</span>
-                  <span className="text-muted-foreground">Não vincular esta doação ao meu perfil na plataforma (Minha Jornada).</span>
-                </label>
-              </div>
+              <p className="text-sm leading-snug">
+                <span className="font-bold block">Doação anônima</span>
+                <span className="text-muted-foreground">As doações são processadas como anônimas. O histórico individual em “Minha Jornada” não está disponível.</span>
+              </p>
 
               <div className="flex items-start gap-3">
                 <input

@@ -26,7 +26,8 @@ _Populate as you build — short repo map plus pointers to the source-of-truth f
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- O portal administrativo usa contas locais (usuário, senha e TOTP compatível com Google Authenticator), sem Clerk. A primeira conta só pode ser criada manualmente para operador cuja identidade o instituto verificou; veja `artifacts/api-server/STAFF_BOOTSTRAP.md`. Não há cadastro público de equipe nem senha padrão.
+- Sem contas de doadores, “Minha jornada” não oferece histórico individual. Não vincular doações públicas a contas administrativas nem apresentar histórico fictício.
 
 ## Product
 

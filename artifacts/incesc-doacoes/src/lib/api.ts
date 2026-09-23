@@ -83,6 +83,38 @@ export interface TransparencySummary {
 export interface User {
   userId: string;
   role: string;
+  username?: string;
+  name?: string;
+  email?: string;
+}
+
+export type AuthNext = "totp" | "setup" | "password";
+export interface AuthResponse { next: AuthNext }
+export interface TotpSetup { secret: string; otpauthUrl: string }
+
+export function useLogin() {
+  return useMutation({ mutationFn: (data: { username: string; password: string }) =>
+    fetcher<AuthResponse>("/auth/login", { method: "POST", json: data }) });
+}
+export function useChangePassword() {
+  return useMutation({ mutationFn: (password: string) =>
+    fetcher<AuthResponse>("/auth/password", { method: "POST", json: { password } }) });
+}
+export function useTotpSetup() {
+  return useMutation({ mutationFn: () =>
+    fetcher<TotpSetup>("/auth/totp/setup", { method: "POST" }) });
+}
+export function useTotpVerify() {
+  const queryClient = useQueryClient();
+  return useMutation({ mutationFn: (code: string) =>
+    fetcher<{ userId: string; role: string }>("/auth/totp/verify", { method: "POST", json: { code } }),
+    onSuccess: (user) => queryClient.setQueryData(["me"], user),
+  });
+}
+export function useLogout() {
+  const queryClient = useQueryClient();
+  return useMutation({ mutationFn: () => fetcher<void>("/auth/logout", { method: "POST" }),
+    onSuccess: () => queryClient.clear() });
 }
 
 export interface Donation {
@@ -273,6 +305,15 @@ export function useAdminUsers() {
   return useQuery({
     queryKey: ["admin", "users"],
     queryFn: () => fetcher<any[]>("/admin/users"),
+  });
+}
+
+export function useCreateAdminUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { username: string; name?: string; email?: string; role: string }) =>
+      fetcher<{ user: any; temporaryPassword: string }>("/admin/users", { method: "POST", json: data }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
   });
 }
 

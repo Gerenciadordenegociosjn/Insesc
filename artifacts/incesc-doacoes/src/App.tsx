@@ -7,8 +7,7 @@ import NotFound from '@/pages/not-found';
 import Home from '@/pages/home';
 import Transparencia from '@/pages/transparencia';
 import MinhaJornada from '@/pages/minha-jornada';
-import SignInPage from '@/pages/sign-in';
-import SignUpPage from '@/pages/sign-up';
+import AdminLogin from '@/pages/admin/login';
 import ConfirmationPage from '@/pages/confirmation';
 import AdminDashboard from '@/pages/admin/dashboard';
 import AdminActions from '@/pages/admin/actions';
@@ -17,9 +16,6 @@ import AdminExpenses from '@/pages/admin/expenses';
 import AdminUsers from '@/pages/admin/users';
 import AdminAuditLogs from '@/pages/admin/audit';
 import AdminLayout from '@/components/admin-layout';
-import { ClerkProvider } from '@clerk/react';
-import { publishableKeyFromHost } from '@clerk/react/internal';
-import logoUrl from '@/assets/logo.png';
 import {
   Route,
   Switch,
@@ -29,17 +25,6 @@ import {
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-const clerkPubKey = publishableKeyFromHost(
-  window.location.hostname,
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
-
-function stripBase(path: string) {
-  return basePath && path.startsWith(basePath)
-    ? path.slice(basePath.length) || '/'
-    : path;
-}
-
 function Router() {
   const [location] = useLocation();
 
@@ -83,8 +68,7 @@ function Router() {
         <Route path="/doacoes" component={Home} />
         <Route path="/transparencia" component={Transparencia} />
         <Route path="/minha-jornada" component={MinhaJornada} />
-        <Route path="/sign-in/*?" component={SignInPage} />
-        <Route path="/sign-up/*?" component={SignUpPage} />
+        <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin/actions">
           <AdminLayout>
             <AdminActions />
@@ -131,69 +115,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={basePath}>
-          <ClerkRouterBridge />
+          <Router />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
-  );
-}
-
-function ClerkRouterBridge() {
-  const [, navigate] = useLocation();
-
-  if (!clerkPubKey) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background text-foreground p-4 text-center">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Clerk não configurado</h1>
-          <p>A chave pública do Clerk (VITE_CLERK_PUBLISHABLE_KEY) está ausente.</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={import.meta.env.VITE_CLERK_PROXY_URL}
-      appearance={{
-        options: {
-          logoPlacement: 'inside',
-          logoLinkUrl: basePath || '/',
-          logoImageUrl: new URL(logoUrl, window.location.origin).toString(),
-        },
-        variables: {
-          colorPrimary: '#087d69',
-          colorForeground: '#1f3440',
-          colorBackground: '#ffffff',
-          colorInput: '#ffffff',
-          colorInputForeground: '#1f3440',
-          colorNeutral: '#cdd9dd',
-          fontFamily: 'Inter, sans-serif',
-          borderRadius: '0.75rem',
-        },
-        elements: {
-          socialButtonsBlockButtonText: { color: '#1f3440' },
-          socialButtonsBlockButton: { backgroundColor: '#ffffff', borderColor: '#cdd9dd' },
-          formFieldInput: { backgroundColor: '#ffffff', color: '#1f3440', borderColor: '#cdd9dd' },
-          formFieldLabel: { color: '#1f3440' },
-          footerActionText: { color: '#516775' },
-          footerActionLink: { color: '#087d69' },
-          dividerText: { color: '#516775' },
-        },
-      }}
-      localization={{
-        signIn: { start: { title: 'Acesse sua conta INCESC', subtitle: 'Entre para acompanhar suas contribuições.' } },
-        signUp: { start: { title: 'Crie sua conta INCESC', subtitle: 'Acompanhe sua participação nas ações do instituto.' } },
-      }}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
-      routerPush={(to) => navigate(stripBase(to))}
-      routerReplace={(to) => navigate(stripBase(to), { replace: true })}
-    >
-      <Router />
-    </ClerkProvider>
   );
 }
 

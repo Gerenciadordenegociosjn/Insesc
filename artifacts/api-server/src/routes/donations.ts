@@ -1,5 +1,4 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
-import { getAuth } from "@clerk/express";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { Readable } from "node:stream";
 import { db, donationActionsTable, donationsTable, expensesTable, usersTable, auditLogsTable, objectUploadIntentsTable } from "@workspace/db";
@@ -14,6 +13,7 @@ import { ObjectNotFoundError, ObjectStorageService } from "../lib/objectStorage"
 import { z } from "zod";
 import { getUncachableStripeClient, setStripeReady } from "../stripeClient";
 import { classifyStripeDonation } from "../stripeClassification";
+import { userFromSession } from "../lib/auth";
 
 const router: IRouter = Router();
 const staffRoles = new Set(["administrator", "financial", "content", "transparency", "auditor", "support"]);
@@ -44,23 +44,12 @@ function expenseResponse(e: typeof expensesTable.$inferSelect) {
     status: e.status, originalReceiptPath: e.originalReceiptPath, reviewedReceiptPath: e.reviewedReceiptPath };
 }
 
-function clerkUserId(req: Request): string | null {
-  const auth = getAuth(req);
-  return auth.userId ?? null;
-}
-
 async function currentUser(req: Request) {
-  const id = clerkUserId(req);
-  if (!id) return null;
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id));
-  if (user) return user;
-  // JIT provisioning is deliberately unassigned; it can never grant staff access.
-  const [created] = await db.insert(usersTable).values({ id }).onConflictDoNothing().returning();
-  return created ?? (await db.select().from(usersTable).where(eq(usersTable.id, id)))[0] ?? null;
+  return userFromSession(req);
 }
 
-function requireAuth(req: Request, res: Response, next: NextFunction): void {
-  if (!clerkUserId(req)) {
+async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (!(await userFromSession(req))) {
     res.status(401).json({ error: "Authentication required" });
     return;
   }
@@ -171,7 +160,7 @@ router.post("/public/donations/create-checkout", async (req, res): Promise<void>
     const product = products.find((item: any) => item.metadata?.incesc_donation === "true") ??
       await stripe.products.create("Doação INCESC", "Doação para uma ação publicada do INCESC", "incesc-donation-product-v1");
     // Prices are created server-side and referenced by ID; price_data is never accepted from clients.
-    const userId = clerkUserId(req);
+     const userId = (await userFromSession(req))?.id ?? null;
     if (!anonymous && !userId) { res.status(401).json({ error: "Login is required for a non-anonymous donation." }); return; }
     const [donation] = await db.insert(donationsTable).values({
       actionId, donorUserId: anonymous ? null : userId, amountCents,
@@ -252,7 +241,7 @@ router.get("/public/donations/checkout-status/:sessionId", async (req, res): Pro
 router.get("/me", requireAuth, async (req, res): Promise<void> => {
   const user = await currentUser(req);
   if (!user) { res.status(401).json({ error: "Authentication required" }); return; }
-  res.json(GetMeResponse.parse({ userId: user.id, role: user.active ? user.role : "unassigned" }));
+  res.json({ userId: user.id, username: user.username, role: user.active ? user.role : "unassigned" });
 });
 
 router.get("/me/donations", requireAuth, async (req, res): Promise<void> => {
@@ -412,7 +401,7 @@ router.post("/admin/expenses/:id/publish", requireRoles("administrator", "transp
 
 router.get("/admin/users", requireRoles("administrator"), async (_req, res): Promise<void> => {
   const rows = await db.select().from(usersTable).orderBy(desc(usersTable.createdAt));
-  res.json(ListAdminUsersResponse.parse(rows));
+  res.json(rows.map(({ id, username, email, name, role, active }) => ({ id, username, email, name, role, active })));
 });
 router.patch("/admin/users/:id/role", requireRoles("administrator"), async (req, res): Promise<void> => {
   const parsed = z.object({ role: roleSchema }).strict().safeParse(req.body);
@@ -423,7 +412,7 @@ router.patch("/admin/users/:id/role", requireRoles("administrator"), async (req,
   if (!target) { res.status(404).json({ error: "User not found" }); return; }
   const [updated] = await db.update(usersTable).set({ role: parsed.data.role, updatedAt: new Date() }).where(eq(usersTable.id, target.id)).returning();
   await db.insert(auditLogsTable).values({ userId: actor.id, entityType: "user", entityId: target.id, action: "role_changed", metadata: { from: target.role, to: parsed.data.role } });
-  res.json({ id: updated.id, email: updated.email, name: updated.name, role: updated.role, active: updated.active });
+  res.json({ id: updated.id, username: updated.username, email: updated.email, name: updated.name, role: updated.role, active: updated.active });
 });
 router.get("/admin/audit-logs", requireRoles("administrator", "auditor"), async (_req, res): Promise<void> => {
   const rows = await db.select().from(auditLogsTable).orderBy(desc(auditLogsTable.createdAt));
