@@ -97,8 +97,12 @@ export default function MinhaJornada() {
                             </div>
                           </div>
                           <div className="sm:text-right ml-16 sm:ml-0">
-                            <p className="text-xl font-black text-secondary">{formatCurrency(donation.amountCents)}</p>
-                            <p className="text-xs font-bold text-success uppercase tracking-wider">Pago</p>
+                            <p className="text-xl font-black text-secondary">{formatCurrency(donation.netAmountCents ?? donation.amountCents)}</p>
+                            {donation.refundedCents && donation.refundedCents > 0 ? (
+                              <p className="text-xs font-bold text-warning uppercase tracking-wider mb-1">Reembolso parcial</p>
+                            ) : (
+                              <p className="text-xs font-bold text-success uppercase tracking-wider">Pago</p>
+                            )}
                           </div>
                         </div>
                       )

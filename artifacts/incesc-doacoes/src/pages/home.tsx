@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useUser } from "@clerk/react";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -49,8 +50,10 @@ const categoryIcons: Record<string, any> = {
 
 export default function Home() {
   const { toast } = useToast();
+  const { isSignedIn } = useUser();
+  const [, setLocation] = useLocation();
   const { data: actions = [], isLoading } = usePublicActions();
-  const { data: checkoutStatus } = useCheckoutStatus();
+  const { data: checkoutStatus, isLoading: isLoadingCheckoutStatus } = useCheckoutStatus();
   const createCheckout = useCreateCheckout();
   
   // Donation State
@@ -60,6 +63,10 @@ export default function Home() {
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isDonationVisible, setIsDonationVisible] = useState(false);
 
+  // New form fields
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(true);
+  const [communicationConsent, setCommunicationConsent] = useState<boolean>(false);
+
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
@@ -67,6 +74,8 @@ export default function Home() {
     setSelectedAction(action);
     setSelectedValue(null);
     setCustomValue("");
+    setIsAnonymous(!isSignedIn); // Default to linked if signed in, otherwise anonymous
+    setCommunicationConsent(false);
     setIsDonationModalOpen(true);
   };
 
@@ -74,10 +83,10 @@ export default function Home() {
     if (!selectedAction) return;
 
     const amount = selectedValue ?? Number(customValue);
-    if (!Number.isFinite(amount) || amount <= 0 || Math.abs(Math.round(amount * 100) - amount * 100) > 0.000001) {
+    if (!Number.isFinite(amount) || amount < 1 || amount > 100000 || Math.abs(Math.round(amount * 100) - amount * 100) > 0.000001) {
       toast({
         title: "Valor inválido",
-        description: "Selecione um valor positivo em reais, com até duas casas decimais.",
+        description: "O valor deve estar entre R$ 1,00 e R$ 100.000,00.",
         variant: "destructive"
       });
       return;
@@ -93,10 +102,15 @@ export default function Home() {
     }
 
     createCheckout.mutate(
-      { actionId: selectedAction.id, amountCents: Math.round(amount * 100) },
+      { 
+        actionId: selectedAction.id, 
+        amountCents: Math.round(amount * 100),
+        anonymous: isAnonymous,
+        communicationConsent: communicationConsent
+      },
       {
         onSuccess: (data) => {
-          if (data.url) window.location.href = data.url;
+          if (data.checkoutUrl) window.location.href = data.checkoutUrl;
         },
         onError: (err: any) => {
           toast({
@@ -229,8 +243,10 @@ export default function Home() {
                       <Button 
                         onClick={() => openDonationModal(action)}
                         className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl h-12"
+                        disabled={isLoadingCheckoutStatus || !checkoutStatus?.available}
+                        title={checkoutStatus?.available ? "" : checkoutStatus?.reason}
                       >
-                        Apoiar iniciativa
+                        {isLoadingCheckoutStatus ? "Aguarde..." : "Apoiar iniciativa"}
                       </Button>
                     </motion.div>
                   );
@@ -350,7 +366,7 @@ export default function Home() {
             </div>
 
             <div>
-              <label htmlFor="custom-donation-modal" className="block text-left font-semibold mb-2 text-sm text-muted-foreground">Ou informe outro valor</label>
+              <label htmlFor="custom-donation-modal" className="block text-left font-semibold mb-2 text-sm text-muted-foreground">Ou informe outro valor (R$ 1 a R$ 100.000)</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-muted-foreground font-black text-lg">
                   R$
@@ -359,7 +375,8 @@ export default function Home() {
                   id="custom-donation-modal"
                   type="number"
                   inputMode="decimal"
-                  min="0.01"
+                  min="1"
+                  max="100000"
                   step="0.01"
                   placeholder="Outro valor"
                   className="pl-14 h-14 text-lg rounded-2xl border-2 focus-visible:border-secondary font-bold bg-background"
@@ -372,12 +389,54 @@ export default function Home() {
               </div>
             </div>
 
+            <div className="space-y-4 pt-4 border-t border-border text-left">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="anonymous-donation"
+                  className="mt-1 w-4 h-4 rounded border-border"
+                  checked={isAnonymous}
+                  onChange={(e) => {
+                    if (!e.target.checked && !isSignedIn) {
+                      toast({
+                        title: "Login necessário",
+                        description: "Para vincular esta doação ao seu perfil (Minha Jornada), você precisa estar conectado. Faça login primeiro.",
+                      });
+                      setLocation("/sign-in");
+                    } else {
+                      setIsAnonymous(e.target.checked);
+                    }
+                  }}
+                />
+                <label htmlFor="anonymous-donation" className="text-sm leading-snug">
+                  <span className="font-bold block">Doação Anônima</span>
+                  <span className="text-muted-foreground">Não vincular esta doação ao meu perfil na plataforma (Minha Jornada).</span>
+                </label>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="communication-consent"
+                  className="mt-1 w-4 h-4 rounded border-border"
+                  checked={communicationConsent}
+                  onChange={(e) => setCommunicationConsent(e.target.checked)}
+                />
+                <label htmlFor="communication-consent" className="text-sm leading-snug">
+                  <span className="font-bold block">Aceito receber comunicações</span>
+                  <span className="text-muted-foreground">Gostaria de receber atualizações sobre as ações do INCESC.</span>
+                </label>
+              </div>
+            </div>
+
             <div className="bg-primary/5 p-4 rounded-xl text-sm text-primary flex gap-3 items-start text-left">
               <Info className="w-5 h-5 shrink-0 mt-0.5" />
               <p>
-                {checkoutStatus?.available 
-                  ? "Você será redirecionado para a página segura de pagamento."
-                  : checkoutStatus?.reason || "A conexão de pagamento não está ativa no momento."}
+                {isLoadingCheckoutStatus 
+                  ? "Verificando disponibilidade de pagamento..."
+                  : checkoutStatus?.available 
+                    ? "Você será redirecionado para a página segura de pagamento."
+                    : checkoutStatus?.reason || "A conexão de pagamento não está ativa no momento."}
               </p>
             </div>
 
@@ -385,7 +444,7 @@ export default function Home() {
               size="lg" 
               className="w-full h-14 text-lg rounded-xl font-black bg-primary hover:bg-primary/90 text-primary-foreground flex justify-between items-center px-6"
               onClick={handleDonate}
-              disabled={createCheckout.isPending || !checkoutStatus?.available}
+              disabled={createCheckout.isPending || !checkoutStatus?.available || isLoadingCheckoutStatus}
             >
               <span>{createCheckout.isPending ? "Preparando..." : "Ir para pagamento"}</span>
               <ChevronRight className="w-5 h-5 opacity-70" />

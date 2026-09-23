@@ -9,6 +9,7 @@ import Transparencia from '@/pages/transparencia';
 import MinhaJornada from '@/pages/minha-jornada';
 import SignInPage from '@/pages/sign-in';
 import SignUpPage from '@/pages/sign-up';
+import ConfirmationPage from '@/pages/confirmation';
 import AdminDashboard from '@/pages/admin/dashboard';
 import AdminActions from '@/pages/admin/actions';
 import AdminDonations from '@/pages/admin/donations';
@@ -18,6 +19,7 @@ import AdminAuditLogs from '@/pages/admin/audit';
 import AdminLayout from '@/components/admin-layout';
 import { ClerkProvider } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
+import logoUrl from '@/assets/logo.png';
 import {
   Route,
   Switch,
@@ -76,16 +78,13 @@ function Router() {
   return (
     <RoutedErrorBoundary>
       <Switch>
+        <Route path="/doacoes/confirmacao" component={ConfirmationPage} />
         <Route path="/" component={Home} />
+        <Route path="/doacoes" component={Home} />
         <Route path="/transparencia" component={Transparencia} />
         <Route path="/minha-jornada" component={MinhaJornada} />
         <Route path="/sign-in/*?" component={SignInPage} />
         <Route path="/sign-up/*?" component={SignUpPage} />
-        <Route path="/admin">
-          <AdminLayout>
-            <AdminDashboard />
-          </AdminLayout>
-        </Route>
         <Route path="/admin/actions">
           <AdminLayout>
             <AdminActions />
@@ -109,6 +108,11 @@ function Router() {
         <Route path="/admin/audit-logs">
           <AdminLayout>
             <AdminAuditLogs />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin">
+          <AdminLayout>
+            <AdminDashboard />
           </AdminLayout>
         </Route>
         <Route component={NotFound} />
@@ -153,6 +157,36 @@ function ClerkRouterBridge() {
     <ClerkProvider
       publishableKey={clerkPubKey}
       proxyUrl={import.meta.env.VITE_CLERK_PROXY_URL}
+      appearance={{
+        options: {
+          logoPlacement: 'inside',
+          logoLinkUrl: basePath || '/',
+          logoImageUrl: new URL(logoUrl, window.location.origin).toString(),
+        },
+        variables: {
+          colorPrimary: '#087d69',
+          colorForeground: '#1f3440',
+          colorBackground: '#ffffff',
+          colorInput: '#ffffff',
+          colorInputForeground: '#1f3440',
+          colorNeutral: '#cdd9dd',
+          fontFamily: 'Inter, sans-serif',
+          borderRadius: '0.75rem',
+        },
+        elements: {
+          socialButtonsBlockButtonText: { color: '#1f3440' },
+          socialButtonsBlockButton: { backgroundColor: '#ffffff', borderColor: '#cdd9dd' },
+          formFieldInput: { backgroundColor: '#ffffff', color: '#1f3440', borderColor: '#cdd9dd' },
+          formFieldLabel: { color: '#1f3440' },
+          footerActionText: { color: '#516775' },
+          footerActionLink: { color: '#087d69' },
+          dividerText: { color: '#516775' },
+        },
+      }}
+      localization={{
+        signIn: { start: { title: 'Acesse sua conta INCESC', subtitle: 'Entre para acompanhar suas contribuições.' } },
+        signUp: { start: { title: 'Crie sua conta INCESC', subtitle: 'Acompanhe sua participação nas ações do instituto.' } },
+      }}
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
       routerPush={(to) => navigate(stripBase(to))}

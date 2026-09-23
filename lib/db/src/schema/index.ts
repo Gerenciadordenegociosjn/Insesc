@@ -1,6 +1,7 @@
 import { createInsertSchema } from "drizzle-zod";
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -45,11 +46,18 @@ export const donationsTable = pgTable("donations", {
   paymentMethod: text("payment_method"),
   paymentStatus: text("payment_status").notNull().default("pending"),
   gatewayTransactionId: text("gateway_transaction_id"),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
   anonymous: boolean("anonymous").notNull().default(true),
   communicationConsent: boolean("communication_consent").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   paidAt: timestamp("paid_at", { withTimezone: true }),
-});
+  refundedAt: timestamp("refunded_at", { withTimezone: true }),
+  refundedCents: integer("refunded_cents").notNull().default(0),
+  nextReconcileAt: timestamp("next_reconcile_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("donations_reconcile_status_due_idx").on(table.paymentStatus, table.nextReconcileAt),
+]);
 
 export const expensesTable = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),

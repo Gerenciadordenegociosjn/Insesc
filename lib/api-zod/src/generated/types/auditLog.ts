@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { SafeAuditMetadata } from './safeAuditMetadata';
 
 export interface AuditLog {
   id: string;
@@ -13,5 +14,6 @@ export interface AuditLog {
   entityType: string;
   entityId: string;
   action: string;
+  metadata?: SafeAuditMetadata | null;
   createdAt: Date;
 }

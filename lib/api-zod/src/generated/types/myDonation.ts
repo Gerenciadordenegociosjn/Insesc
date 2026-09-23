@@ -10,6 +10,8 @@ export interface MyDonation {
   id: string;
   actionId: string;
   amountCents: number;
+  refundedCents: number;
+  netAmountCents: number;
   paymentStatus: string;
   createdAt: Date;
   /** @nullable */

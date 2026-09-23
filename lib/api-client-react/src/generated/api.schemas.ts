@@ -57,6 +57,28 @@ export interface DonationCheckoutInput {
   communicationConsent?: boolean;
 }
 
+export interface DonationCheckoutResponse {
+  checkoutUrl: string;
+  donationId: string;
+}
+
+export type DonationCheckoutStatusPaymentStatus = typeof DonationCheckoutStatusPaymentStatus[keyof typeof DonationCheckoutStatusPaymentStatus];
+
+
+export const DonationCheckoutStatusPaymentStatus = {
+  pending: 'pending',
+  paid: 'paid',
+  failed: 'failed',
+  refunded: 'refunded',
+} as const;
+
+export interface DonationCheckoutStatus {
+  donationId: string;
+  paymentStatus: DonationCheckoutStatusPaymentStatus;
+  refundedCents: number;
+  netAmountCents: number;
+}
+
 export interface Me {
   userId: string;
   role: string;
@@ -66,6 +88,8 @@ export interface MyDonation {
   id: string;
   actionId: string;
   amountCents: number;
+  refundedCents: number;
+  netAmountCents: number;
   paymentStatus: string;
   createdAt: string;
   /** @nullable */
@@ -223,6 +247,17 @@ export interface UploadIntentResponse {
   expenseId?: string | null;
 }
 
+export interface SafeAuditMetadata {
+  changedFields?: string[];
+  previousStatus?: string;
+  nextStatus?: string;
+  from?: string;
+  to?: string;
+  purpose?: string;
+  contentType?: string;
+  size?: number;
+}
+
 export interface AuditLog {
   id: string;
   /** @nullable */
@@ -230,7 +265,13 @@ export interface AuditLog {
   entityType: string;
   entityId: string;
   action: string;
+  metadata?: SafeAuditMetadata | null;
   createdAt: string;
+}
+
+export interface ActionOption {
+  id: string;
+  title: string;
 }
 
 export interface AdminDashboard {
@@ -256,4 +297,9 @@ export type ForbiddenResponse = ErrorResponse;
  * Invalid request
  */
 export type BadRequestResponse = ErrorResponse;
+
+/**
+ * Payment provider unavailable
+ */
+export type ServiceUnavailableResponse = ErrorResponse;
 

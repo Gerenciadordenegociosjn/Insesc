@@ -89,7 +89,9 @@ export interface Donation {
   id: string;
   actionId: string;
   amountCents: number;
-  paymentStatus: "pending" | "paid" | "failed";
+  refundedCents?: number;
+  netAmountCents?: number;
+  paymentStatus: "pending" | "paid" | "failed" | "refunded";
   createdAt: string;
   paidAt: string | null;
 }
@@ -136,11 +138,21 @@ export function useCheckoutStatus() {
 
 export function useCreateCheckout() {
   return useMutation({
-    mutationFn: (data: { actionId?: string; amountCents: number }) =>
-      fetcher<{ url: string }>("/public/donations/create-checkout", {
+    mutationFn: (data: { actionId: string; amountCents: number; anonymous?: boolean; communicationConsent?: boolean }) =>
+      fetcher<{ checkoutUrl: string; donationId: string }>("/public/donations/create-checkout", {
         method: "POST",
         json: data,
       }),
+  });
+}
+
+export function useCheckoutStatusResult(sessionId: string) {
+  return useQuery({
+    queryKey: ["public", "checkout-result", sessionId],
+    queryFn: () => fetcher<{ donationId: string; paymentStatus: string; refundedCents?: number; netAmountCents?: number; amountCents?: number }>(`/public/donations/checkout-status/${sessionId}`),
+    enabled: !!sessionId,
+    retry: 3,
+    refetchInterval: (query) => query.state.data?.paymentStatus === "pending" ? 5000 : false,
   });
 }
 
@@ -171,6 +183,13 @@ export function useAdminDashboard() {
   return useQuery({
     queryKey: ["admin", "dashboard"],
     queryFn: () => fetcher<any>("/admin/dashboard"),
+  });
+}
+
+export function useAdminActionOptions() {
+  return useQuery({
+    queryKey: ["admin", "action-options"],
+    queryFn: () => fetcher<{ id: string; title: string }[]>("/admin/action-options"),
   });
 }
 

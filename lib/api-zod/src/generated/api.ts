@@ -74,7 +74,22 @@ export const CreateDonationCheckoutBody = zod.object({
   "communicationConsent": zod.boolean().default(createDonationCheckoutBodyCommunicationConsentDefault)
 })
 
-export const CreateDonationCheckoutResponse = zod.void()
+export const CreateDonationCheckoutResponse = zod.object({
+  "checkoutUrl": zod.string().url(),
+  "donationId": zod.string().uuid()
+})
+
+
+export const GetDonationCheckoutStatusParams = zod.object({
+  "sessionId": zod.coerce.string()
+})
+
+export const GetDonationCheckoutStatusResponse = zod.object({
+  "donationId": zod.string().uuid(),
+  "paymentStatus": zod.enum(['pending', 'paid', 'failed', 'refunded']),
+  "refundedCents": zod.number().int(),
+  "netAmountCents": zod.number().int()
+})
 
 
 export const GetMeResponse = zod.object({
@@ -87,6 +102,8 @@ export const ListMyDonationsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "actionId": zod.string().uuid(),
   "amountCents": zod.number().int(),
+  "refundedCents": zod.number().int(),
+  "netAmountCents": zod.number().int(),
   "paymentStatus": zod.string(),
   "createdAt": zod.coerce.date(),
   "paidAt": zod.coerce.date().nullish()
@@ -140,6 +157,13 @@ export const ListAdminActionsResponseItem = zod.object({
   "createdAt": zod.coerce.date().optional()
 }))
 export const ListAdminActionsResponse = zod.array(ListAdminActionsResponseItem)
+
+
+export const ListAdminActionOptionsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "title": zod.string()
+})
+export const ListAdminActionOptionsResponse = zod.array(ListAdminActionOptionsResponseItem)
 
 
 
@@ -218,6 +242,8 @@ export const ListAdminDonationsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "actionId": zod.string().uuid(),
   "amountCents": zod.number().int(),
+  "refundedCents": zod.number().int(),
+  "netAmountCents": zod.number().int(),
   "paymentStatus": zod.string(),
   "createdAt": zod.coerce.date(),
   "paidAt": zod.coerce.date().nullish()
@@ -354,6 +380,16 @@ export const ListAdminAuditLogsResponseItem = zod.object({
   "entityType": zod.string(),
   "entityId": zod.string(),
   "action": zod.string(),
+  "metadata": zod.union([zod.object({
+  "changedFields": zod.array(zod.string()).optional(),
+  "previousStatus": zod.string().optional(),
+  "nextStatus": zod.string().optional(),
+  "from": zod.string().optional(),
+  "to": zod.string().optional(),
+  "purpose": zod.string().optional(),
+  "contentType": zod.string().optional(),
+  "size": zod.number().int().optional()
+}),zod.null()]).optional(),
   "createdAt": zod.coerce.date()
 })
 export const ListAdminAuditLogsResponse = zod.array(ListAdminAuditLogsResponseItem)

@@ -39,8 +39,26 @@ export default function AdminAuditLogs() {
                     <td className="px-6 py-4 font-mono text-xs text-muted-foreground">
                       {log.userId}
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs">
-                      {log.details ? JSON.stringify(log.details) : '-'}
+                    <td className="px-6 py-4">
+                      {log.metadata ? (
+                        <div className="space-y-1">
+                          {log.metadata.changedFields && (
+                            <p><span className="font-bold text-muted-foreground">Campos alterados:</span> {log.metadata.changedFields.join(", ")}</p>
+                          )}
+                          {(log.metadata.from || log.metadata.previousStatus) && (
+                            <p><span className="font-bold text-muted-foreground">De:</span> {log.metadata.from || log.metadata.previousStatus}</p>
+                          )}
+                          {(log.metadata.to || log.metadata.nextStatus) && (
+                            <p><span className="font-bold text-muted-foreground">Para:</span> {log.metadata.to || log.metadata.nextStatus}</p>
+                          )}
+                          {log.metadata.purpose && (
+                            <p><span className="font-bold text-muted-foreground">Propósito (Upload):</span> {log.metadata.purpose}</p>
+                          )}
+                          {log.metadata.contentType && (
+                            <p><span className="font-bold text-muted-foreground">Tipo de Arquivo:</span> {log.metadata.contentType} ({Math.round(log.metadata.size / 1024)} KB)</p>
+                          )}
+                        </div>
+                      ) : '-'}
                     </td>
                   </tr>
                 ))}

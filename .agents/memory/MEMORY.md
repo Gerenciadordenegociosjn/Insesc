@@ -1,0 +1,1 @@
+- [Stripe connector payment confirmation](stripe-connector-confirmation.md) — proxy-only Stripe connections need server reconciliation instead of assuming webhook credentials exist.

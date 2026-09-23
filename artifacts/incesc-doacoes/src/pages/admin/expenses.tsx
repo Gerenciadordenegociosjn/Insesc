@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAdminExpenses, useCreateExpense, useReviewExpense, usePublishExpense, useAdminActions, Expense, useRequestUploadUrl, useMe } from "@/lib/api";
+import { useAdminExpenses, useCreateExpense, useReviewExpense, usePublishExpense, useAdminActionOptions, Expense, useRequestUploadUrl, useMe } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -10,7 +10,7 @@ import { ptBR } from "date-fns/locale";
 
 export default function AdminExpenses() {
   const { data: expenses = [], isLoading: loadingExpenses } = useAdminExpenses();
-  const { data: actions = [] } = useAdminActions();
+  const { data: actions = [] } = useAdminActionOptions();
   const { data: me } = useMe();
   const createExpense = useCreateExpense();
   const reviewExpense = useReviewExpense();

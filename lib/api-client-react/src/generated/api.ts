@@ -21,6 +21,7 @@ import type {
 
 import type {
   ActionInput,
+  ActionOption,
   ActionUpdate,
   AdminAction,
   AdminDashboard,
@@ -31,6 +32,8 @@ import type {
   BadRequestResponse,
   CheckoutStatus,
   DonationCheckoutInput,
+  DonationCheckoutResponse,
+  DonationCheckoutStatus,
   ErrorResponse,
   ExpenseInput,
   ExpenseReviewInput,
@@ -39,6 +42,7 @@ import type {
   Me,
   MyDonation,
   PublicAction,
+  ServiceUnavailableResponse,
   TransparencySummary,
   UnauthorizedResponse,
   UploadIntentInput,
@@ -372,7 +376,7 @@ export const getCreateDonationCheckoutUrl = () => {
   return `/api/public/donations/create-checkout`
 }
 
-export const createDonationCheckout = async (donationCheckoutInput: DonationCheckoutInput, options?: Parameters<typeof customFetch>[1]): Promise<unknown> => {
+export const createDonationCheckout = async (donationCheckoutInput: DonationCheckoutInput, options?: Parameters<typeof customFetch>[1]): Promise<DonationCheckoutResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -388,7 +392,7 @@ export const createDonationCheckout = async (donationCheckoutInput: DonationChec
     }
     return headers;
   };
-return customFetch<unknown>(getCreateDonationCheckoutUrl(),
+return customFetch<DonationCheckoutResponse>(getCreateDonationCheckoutUrl(),
   {
     ...options,
     method: 'POST',
@@ -403,7 +407,7 @@ return customFetch<unknown>(getCreateDonationCheckoutUrl(),
 
 export const getCreateDonationCheckoutMutationKey = () => ['createDonationCheckout'] as const;
 
-export const getCreateDonationCheckoutMutationOptions = <TError = ErrorType<ErrorResponse>,
+export const getCreateDonationCheckoutMutationOptions = <TError = ErrorType<BadRequestResponse | void | ErrorResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDonationCheckout>>, TError,CreateDonationCheckoutMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createDonationCheckout>>, TError,CreateDonationCheckoutMutationVariables, TContext> => {
 
@@ -432,10 +436,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type CreateDonationCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof createDonationCheckout>>>
     export type CreateDonationCheckoutMutationBody = BodyType<DonationCheckoutInput>
-    export type CreateDonationCheckoutMutationError = ErrorType<ErrorResponse>
+    export type CreateDonationCheckoutMutationError = ErrorType<BadRequestResponse | void | ErrorResponse>
     export type CreateDonationCheckoutMutationVariables = {data: BodyType<DonationCheckoutInput>}
 
-    export const useCreateDonationCheckout = <TError = ErrorType<ErrorResponse>,
+    export const useCreateDonationCheckout = <TError = ErrorType<BadRequestResponse | void | ErrorResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createDonationCheckout>>, TError,CreateDonationCheckoutMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof createDonationCheckout>>,
@@ -445,6 +449,77 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateDonationCheckoutMutationOptions(options));
     }
+
+export const getGetDonationCheckoutStatusUrl = (sessionId: string,) => {
+
+
+
+
+  return `/api/public/donations/checkout-status/${sessionId}`
+}
+
+export const getDonationCheckoutStatus = async (sessionId: string, options?: Parameters<typeof customFetch>[1]): Promise<DonationCheckoutStatus> => {
+
+  return customFetch<DonationCheckoutStatus>(getGetDonationCheckoutStatusUrl(sessionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDonationCheckoutStatusQueryKey = (sessionId: string,) => {
+    return [
+    `/api/public/donations/checkout-status/${sessionId}`
+    ] as const;
+    }
+
+
+export const getGetDonationCheckoutStatusQueryOptions = <TData = Awaited<ReturnType<typeof getDonationCheckoutStatus>>, TError = ErrorType<BadRequestResponse | void | ServiceUnavailableResponse>>(sessionId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationCheckoutStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDonationCheckoutStatusQueryKey(sessionId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDonationCheckoutStatus>>> = ({ signal }) => getDonationCheckoutStatus(sessionId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: sessionId !== null && sessionId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDonationCheckoutStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDonationCheckoutStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getDonationCheckoutStatus>>>
+export type GetDonationCheckoutStatusQueryError = ErrorType<BadRequestResponse | void | ServiceUnavailableResponse>
+
+
+
+export function useGetDonationCheckoutStatus<TData = Awaited<ReturnType<typeof getDonationCheckoutStatus>>, TError = ErrorType<BadRequestResponse | void | ServiceUnavailableResponse>>(
+ sessionId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDonationCheckoutStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDonationCheckoutStatusQueryOptions(sessionId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetMeUrl = () => {
 
@@ -812,12 +887,83 @@ export function useListAdminActions<TData = Awaited<ReturnType<typeof listAdminA
 
 
 
+export const getListAdminActionOptionsUrl = () => {
+
+
+
+
+  return `/api/admin/action-options`
+}
+
+export const listAdminActionOptions = async ( options?: Parameters<typeof customFetch>[1]): Promise<ActionOption[]> => {
+
+  return customFetch<ActionOption[]>(getListAdminActionOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminActionOptionsQueryKey = () => {
+    return [
+    `/api/admin/action-options`
+    ] as const;
+    }
+
+
+export const getListAdminActionOptionsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminActionOptions>>, TError = ErrorType<ForbiddenResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminActionOptionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminActionOptions>>> = ({ signal }) => listAdminActionOptions({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminActionOptionsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminActionOptions>>>
+export type ListAdminActionOptionsQueryError = ErrorType<ForbiddenResponse>
+
+
+
+export function useListAdminActionOptions<TData = Awaited<ReturnType<typeof listAdminActionOptions>>, TError = ErrorType<ForbiddenResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminActionOptionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getCreateAdminActionUrl = () => {
 
 
 
 
-  return `/api/admin/actions`
+  return `/api/admin/action-options`
 }
 
 export const createAdminAction = async (actionInput: ActionInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminAction> => {

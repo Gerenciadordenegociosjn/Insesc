@@ -71,11 +71,36 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/DonationCheckoutInput" }
       responses:
+        "201":
+          description: Stripe-hosted Checkout URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DonationCheckoutResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: Published action not found }
         "503":
           description: No approved payment provider
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
+  /public/donations/checkout-status/{sessionId}:
+    get:
+      operationId: getDonationCheckoutStatus
+      tags: [public]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Server-verified Checkout status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DonationCheckoutStatus" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: Donation not found }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
   /me:
     get:
       operationId: getMe
@@ -141,6 +166,19 @@ paths:
                 type: array
                 items: { $ref: "#/components/schemas/AdminAction" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /admin/action-options:
+    get:
+      operationId: listAdminActionOptions
+      tags: [admin]
+      responses:
+        "200":
+          description: Safe action choices for expense workflows
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ActionOption" }
         "403": { $ref: "#/components/responses/Forbidden" }
     post:
       operationId: createAdminAction
@@ -312,6 +350,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/ErrorResponse" }
+    ServiceUnavailable:
+      description: Payment provider unavailable
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
   schemas:
     HealthStatus:
       type: object
@@ -374,6 +417,20 @@ components:
         amountCents: { type: integer, minimum: 1 }
         anonymous: { type: boolean, default: true }
         communicationConsent: { type: boolean, default: false }
+    DonationCheckoutResponse:
+      type: object
+      required: [checkoutUrl, donationId]
+      properties:
+        checkoutUrl: { type: string, format: uri }
+        donationId: { type: string, format: uuid }
+    DonationCheckoutStatus:
+      type: object
+      required: [donationId, paymentStatus, refundedCents, netAmountCents]
+      properties:
+        donationId: { type: string, format: uuid }
+        paymentStatus: { type: string, enum: [pending, paid, failed, refunded] }
+        refundedCents: { type: integer }
+        netAmountCents: { type: integer }
     Me:
       type: object
       required: [userId, role]
@@ -382,11 +439,13 @@ components:
         role: { type: string }
     MyDonation:
       type: object
-      required: [id, actionId, amountCents, paymentStatus, createdAt]
+      required: [id, actionId, amountCents, refundedCents, netAmountCents, paymentStatus, createdAt]
       properties:
         id: { type: string, format: uuid }
         actionId: { type: string, format: uuid }
         amountCents: { type: integer }
+        refundedCents: { type: integer }
+        netAmountCents: { type: integer }
         paymentStatus: { type: string }
         createdAt: { type: string, format: date-time }
         paidAt: { type: ["string", "null"], format: date-time }
@@ -502,7 +561,30 @@ components:
         entityType: { type: string }
         entityId: { type: string }
         action: { type: string }
+        metadata:
+          oneOf:
+            - $ref: "#/components/schemas/SafeAuditMetadata"
+            - type: "null"
         createdAt: { type: string, format: date-time }
+    SafeAuditMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        changedFields: { type: array, items: { type: string } }
+        previousStatus: { type: string }
+        nextStatus: { type: string }
+        from: { type: string }
+        to: { type: string }
+        purpose: { type: string }
+        contentType: { type: string }
+        size: { type: integer }
+    ActionOption:
+      type: object
+      required: [id, title]
+      additionalProperties: false
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
     AdminDashboard:
       type: object
       required: [totalRaisedCents, totalDonations, activeActions, completedActions, pendingPayments, receiptsAwaitingReview]

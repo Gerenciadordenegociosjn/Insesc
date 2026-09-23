@@ -7,6 +7,7 @@
  */
 
 export * from './actionInput';
+export * from './actionOption';
 export * from './actionUpdate';
 export * from './adminAction';
 export * from './adminDashboard';
@@ -17,6 +18,9 @@ export * from './auditLog';
 export * from './badRequestResponse';
 export * from './checkoutStatus';
 export * from './donationCheckoutInput';
+export * from './donationCheckoutResponse';
+export * from './donationCheckoutStatus';
+export * from './donationCheckoutStatusPaymentStatus';
 export * from './errorResponse';
 export * from './expenseInput';
 export * from './expenseReviewInput';
@@ -26,6 +30,8 @@ export * from './me';
 export * from './myDonation';
 export * from './publicAction';
 export * from './publicExpense';
+export * from './safeAuditMetadata';
+export * from './serviceUnavailableResponse';
 export * from './transparencySummary';
 export * from './unauthorizedResponse';
 export * from './uploadIntentInput';
