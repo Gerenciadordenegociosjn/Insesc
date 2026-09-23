@@ -2,6 +2,7 @@ import { useLocation, Link } from "wouter";
 import { PortalBlock, PortalMedia } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
+import { Info } from "lucide-react";
 
 export function BlockRenderer({ block, systemComponents, mediaList = [] }: { block: PortalBlock, systemComponents?: Record<string, ReactNode>, mediaList?: PortalMedia[] }) {
   const alignClass = block.alignment === 'center' ? 'text-center mx-auto' : block.alignment === 'right' ? 'text-right ml-auto' : 'text-left';
@@ -17,7 +18,7 @@ export function BlockRenderer({ block, systemComponents, mediaList = [] }: { blo
   switch (block.type) {
     case 'hero':
       return (
-        <div className={`${bgClass} w-full`}>
+        <div className={`${bgClass} ${block.imagePlaceholder ? 'bg-gradient-to-b from-background to-muted/30' : ''} w-full`}>
           <div className={containerClass}>
             <div className={`flex flex-col md:flex-row gap-8 items-center ${block.alignment === 'center' ? 'md:flex-col text-center' : ''}`}>
               <div className={`flex-1 ${alignClass}`}>
@@ -25,13 +26,20 @@ export function BlockRenderer({ block, systemComponents, mediaList = [] }: { blo
                 {block.body && <p className="text-lg text-muted-foreground mb-8">{block.body}</p>}
                 {block.cta && block.cta.href && (
                   <Button asChild size="lg" className="rounded-full text-lg px-8">
-                    {block.cta.href.startsWith("https://") ? <a href={block.cta.href} target="_blank" rel="noopener noreferrer">{block.cta.label}</a> : <Link href={block.cta.href}>{block.cta.label}</Link>}
+                    {block.cta.href.startsWith("https://") ? <a href={block.cta.href} target="_blank" rel="noopener noreferrer">{block.cta.label}</a> : block.cta.href.includes("#") ? <a href={block.cta.href}>{block.cta.label}</a> : <Link href={block.cta.href}>{block.cta.label}</Link>}
                   </Button>
                 )}
               </div>
               {block.imageId && (
                 <div className="flex-1 w-full flex justify-center">
                    <MediaRenderer mediaId={block.imageId} mediaList={mediaList} className="rounded-2xl max-h-[500px] object-cover shadow-xl" />
+                </div>
+              )}
+              {!block.imageId && block.imagePlaceholder && (
+                <div className="flex-1 w-full aspect-[4/3] rounded-3xl bg-muted border-2 border-dashed border-border/60 flex flex-col items-center justify-center text-center p-8">
+                  <Info className="w-8 h-8 text-muted-foreground/50 mb-4" />
+                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-2">Espaço editorial</p>
+                  <p className="text-sm text-muted-foreground max-w-sm">{block.imagePlaceholder}</p>
                 </div>
               )}
             </div>
@@ -45,7 +53,7 @@ export function BlockRenderer({ block, systemComponents, mediaList = [] }: { blo
           <div className={containerClass}>
             <div className={alignClass}>
               {block.heading && <h2 className="text-3xl font-black mb-6">{block.heading}</h2>}
-              <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground whitespace-pre-wrap">
+              <div className={`prose prose-lg dark:prose-invert max-w-none whitespace-pre-wrap ${block.background === 'primary' ? 'text-primary-foreground/85' : 'text-muted-foreground'}`}>
                 {block.body}
               </div>
             </div>
@@ -104,7 +112,7 @@ export function BlockRenderer({ block, systemComponents, mediaList = [] }: { blo
         <div className={`${bgClass} w-full`}>
           <div className={containerClass}>
             {block.heading && <h2 className={`text-3xl font-black mb-12 ${alignClass}`}>{block.heading}</h2>}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid grid-cols-1 md:grid-cols-2 ${block.cards?.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
               {block.cards?.map((card: any, i: number) => (
                 <div key={i} className="bg-card border border-border p-6 rounded-2xl flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
                   <h3 className="text-xl font-bold mb-3">{card.title}</h3>

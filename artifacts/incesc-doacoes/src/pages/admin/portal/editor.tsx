@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRoute, Link } from "wouter";
-import { useAdminPortalPage, useUpdatePortalPage, usePublishPortalPage, PortalBlock, PortalPage, useMe } from "@/lib/api";
+import { useAdminPortalPage, useAdminPortalMedia, useUpdatePortalPage, usePublishPortalPage, PortalBlock, PortalPage, useMe } from "@/lib/api";
+import { currentPageBlocks, isUninitializedCorePage } from "@/lib/portal-defaults";
 import { BlockRenderer } from "@/components/portal-blocks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { LayoutTemplate, ArrowUp, ArrowDown, Trash2, Plus, FileCheck, Save, Settings, GripVertical, Image as ImageIcon, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { SystemActions, SystemTransparency, SystemJourney } from "@/components/system-modules";
 
 export default function AdminPortalEditor() {
   const [, params] = useRoute("/admin/portal/:id");
   const id = params?.id;
   const { data: page, isLoading } = useAdminPortalPage(id || "");
+  const { data: mediaList } = useAdminPortalMedia(!!id);
   const updatePage = useUpdatePortalPage();
   const publishPage = usePublishPortalPage();
   const { toast } = useToast();
@@ -33,7 +36,7 @@ export default function AdminPortalEditor() {
 
   useEffect(() => {
     if (page && initializedFor.current !== id) {
-      setBlocks(page.blocks || []);
+      setBlocks(isUninitializedCorePage(page) ? currentPageBlocks(page.slug) : page.blocks || []);
       setTitle(page.title || "");
       setSlug(page.slug || "");
       initializedFor.current = id;
@@ -137,7 +140,7 @@ export default function AdminPortalEditor() {
     };
   }, [hasUnsavedChanges]);
 
-  if (isLoading) return <div className="animate-pulse h-screen bg-muted rounded-xl"></div>;
+  if (isLoading || (page && initializedFor.current !== id)) return <div className="animate-pulse h-screen bg-muted rounded-xl"></div>;
 
   if (!page) return <div className="p-8 text-center text-destructive">Página não encontrada.</div>;
 
@@ -155,6 +158,7 @@ export default function AdminPortalEditor() {
         </div>
         <div className="flex flex-wrap gap-3 items-center">
           {hasUnsavedChanges && <span className="text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded">Alterações não salvas</span>}
+          {isUninitializedCorePage(page) && <span className="text-xs text-muted-foreground">Estrutura atual carregada. Salve o rascunho para mantê-la.</span>}
           <Button variant="outline" onClick={() => handleSave(false)} disabled={!hasUnsavedChanges || isSaving || updatePage.isPending}>
             <Save className="w-4 h-4 mr-2" /> Salvar Rascunho
           </Button>
@@ -216,8 +220,16 @@ export default function AdminPortalEditor() {
                   
                   {/* Block Render */}
                   <div className={`pointer-events-none opacity-50 absolute inset-0 z-0 ${editingBlockIndex === index ? 'bg-primary/5' : ''}`}></div>
-                  <div className={`relative z-0 ${editingBlockIndex === index ? 'ring-2 ring-primary/20 ring-inset' : ''}`}>
-                    <BlockRenderer block={block} />
+                  <div className={`relative z-0 pointer-events-none ${editingBlockIndex === index ? 'ring-2 ring-primary/20 ring-inset' : ''}`}>
+                    <BlockRenderer
+                      block={block}
+                      mediaList={mediaList || []}
+                      systemComponents={{
+                        actions: <SystemActions />,
+                        transparency: <SystemTransparency />,
+                        journey: <SystemJourney />,
+                      }}
+                    />
                   </div>
                 </div>
               ))}

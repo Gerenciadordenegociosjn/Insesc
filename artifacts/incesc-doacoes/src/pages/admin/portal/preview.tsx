@@ -6,6 +6,7 @@ import { SystemActions, SystemTransparency, SystemJourney } from "@/components/s
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { useAdminPortalPage, useAdminPortalMedia, useMe } from "@/lib/api";
+import { currentPageBlocks, isUninitializedCorePage } from "@/lib/portal-defaults";
 
 export default function AdminPortalPreview() {
   const [, params] = useRoute("/admin/portal/:id/preview");
@@ -35,7 +36,7 @@ export default function AdminPortalPreview() {
       </div>
       <SiteHeader />
       <main className="flex-1 relative">
-         {page.blocks.map(block => (
+         {(isUninitializedCorePage(page) ? currentPageBlocks(page.slug) : page.blocks).map(block => (
             <BlockRenderer 
               key={block.id} 
               block={block}

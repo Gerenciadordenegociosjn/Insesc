@@ -7,7 +7,7 @@ const href = z.string().max(500).refine((v) => {
 }, "O link deve ser um caminho interno ou uma URL HTTPS");
 const base = z.object({ id: z.string().min(1), background: z.string().max(100).optional(), alignment: z.enum(["left", "center", "right"]).optional(), width: z.enum(["narrow", "medium", "wide", "full"]).optional() }).strict();
 export const portalBlockSchema = z.discriminatedUnion("type", [
-  base.extend({ type: z.literal("hero"), heading: z.string().max(300), body: z.string().max(5000).optional(), imageId: z.string().uuid().optional(), cta: z.object({ label: z.string().min(1).max(80), href }).optional() }),
+  base.extend({ type: z.literal("hero"), heading: z.string().max(300), body: z.string().max(5000).optional(), imageId: z.string().uuid().optional(), imagePlaceholder: z.string().max(500).optional(), cta: z.object({ label: z.string().min(1).max(80), href }).optional() }),
   base.extend({ type: z.literal("banner"), text: z.string().max(500), imageId: z.string().uuid().optional(), cta: z.object({ label: z.string().min(1).max(80), href }).optional() }),
   base.extend({ type: z.literal("text"), heading: z.string().max(300).optional(), body: z.string().max(10000) }),
   base.extend({ type: z.literal("image"), mediaId: z.string().uuid(), caption: z.string().max(500).optional() }),

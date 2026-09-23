@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAdminPortalPages, useCreatePortalPage, usePublishPortalPage, useUnpublishPortalPage, useMe } from "@/lib/api";
+import { currentPageBlocks, isUninitializedCorePage } from "@/lib/portal-defaults";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -10,6 +11,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function AdminPortalPages() {
+  const [, navigate] = useLocation();
   const { data: pages, isLoading } = useAdminPortalPages();
   const createPage = useCreatePortalPage();
   const publishPage = usePublishPortalPage();
@@ -102,6 +104,10 @@ export default function AdminPortalPages() {
               }}>
                 <Lock className="w-4 h-4 mr-2" /> Despublicar
               </Button>
+            ) : isUninitializedCorePage(page) ? (
+              <Button variant="ghost" size="sm" asChild className="w-full">
+                <Link href={`/admin/portal/${page.id}`}>Preparar estrutura antes de publicar</Link>
+              </Button>
             ) : (
               <Button variant="ghost" size="sm" className="text-secondary hover:text-secondary hover:bg-secondary/10 w-full" onClick={() => {
                 publishPage.mutate({ id: page.id, expectedVersion: page.version }, {
@@ -153,7 +159,10 @@ export default function AdminPortalPages() {
                     createPage.mutate({
                       title: core.title,
                       slug: core.slug,
-                      blocks: [{ type: 'system', id: crypto.randomUUID(), system: core.system, background: 'transparent' }]
+                      blocks: currentPageBlocks(core.slug)
+                    }, {
+                      onSuccess: (created) => navigate(`/admin/portal/${created.id}`),
+                      onError: (err: Error) => toast({ title: "Erro ao criar a página", description: err.message, variant: "destructive" }),
                     });
                   }} 
                   disabled={createPage.isPending}
