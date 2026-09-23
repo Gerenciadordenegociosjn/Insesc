@@ -165,6 +165,32 @@ export class ObjectStorageService {
     return { contentType, size };
   }
 
+  async verifyUploadedMedia(objectPath: string): Promise<{ contentType: string; size: number }> {
+    const file = await this.getObjectEntityFile(objectPath);
+    const [metadata] = await file.getMetadata();
+    const contentType = String(metadata.contentType ?? '');
+    const size = Number(metadata.size ?? 0);
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(contentType) || size <= 0 || size > 8 * 1024 * 1024) {
+      throw new Error('Uploaded media has an unsafe type or size');
+    }
+    const [prefix] = await file.download({ start: 0, end: 15 });
+    const isPng = contentType === 'image/png' && prefix.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+    const isJpeg = contentType === 'image/jpeg' && prefix.subarray(0, 3).equals(Buffer.from([255, 216, 255]));
+    const isWebp = contentType === 'image/webp' && prefix.subarray(0, 4).toString() === 'RIFF' && prefix.subarray(8, 12).toString() === 'WEBP';
+    if (!isPng && !isJpeg && !isWebp) throw new Error('Uploaded media content does not match its declared type');
+    return { contentType, size };
+  }
+
+  async copyToImmutableObject(objectPath: string, contentType: string): Promise<string> {
+    const source = await this.getObjectEntityFile(objectPath);
+    const privateObjectDir = this.getPrivateObjectDir().replace(/\/$/, "");
+    const destinationPath = `/objects/portal-media/${randomUUID()}`;
+    const { bucketName, objectName } = parseObjectPath(`${privateObjectDir}${destinationPath}`);
+    const destination = objectStorageClient.bucket(bucketName).file(objectName);
+    await source.copy(destination, { metadata: { contentType, cacheControl: "private, no-store" } });
+    return destinationPath;
+  }
+
   async getObjectEntityFile(objectPath: string): Promise<File> {
     if (!objectPath.startsWith('/objects/')) {
       throw new ObjectNotFoundError();

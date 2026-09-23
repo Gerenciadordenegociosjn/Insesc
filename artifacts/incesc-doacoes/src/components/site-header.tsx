@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import logoUrl from "@/assets/logo.png";
 
-const donationUrl = `${import.meta.env.BASE_URL}#doacao`;
+const donationUrl = `${import.meta.env.BASE_URL}#doacoes`;
 
 export function SiteHeader() {
   const [location] = useLocation();

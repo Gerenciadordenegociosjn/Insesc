@@ -35,12 +35,24 @@ import type {
   DonationCheckoutResponse,
   DonationCheckoutStatus,
   ErrorResponse,
+  ExpectedVersion,
   ExpenseInput,
   ExpenseReviewInput,
   ForbiddenResponse,
   HealthStatus,
   Me,
   MyDonation,
+  PortalMediaConfirm,
+  PortalMediaUpload,
+  PortalMediaUploadResponse,
+  PortalNavItem,
+  PortalPage,
+  PortalPageInput,
+  PortalPagePublic,
+  PortalPageUpdate,
+  PortalSettings,
+  PortalSettingsAdmin,
+  PortalSettingsUpdate,
   PublicAction,
   ServiceUnavailableResponse,
   TransparencySummary,
@@ -887,83 +899,12 @@ export function useListAdminActions<TData = Awaited<ReturnType<typeof listAdminA
 
 
 
-export const getListAdminActionOptionsUrl = () => {
-
-
-
-
-  return `/api/admin/action-options`
-}
-
-export const listAdminActionOptions = async ( options?: Parameters<typeof customFetch>[1]): Promise<ActionOption[]> => {
-
-  return customFetch<ActionOption[]>(getListAdminActionOptionsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getListAdminActionOptionsQueryKey = () => {
-    return [
-    `/api/admin/action-options`
-    ] as const;
-    }
-
-
-export const getListAdminActionOptionsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminActionOptions>>, TError = ErrorType<ForbiddenResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getListAdminActionOptionsQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminActionOptions>>> = ({ signal }) => listAdminActionOptions({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type ListAdminActionOptionsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminActionOptions>>>
-export type ListAdminActionOptionsQueryError = ErrorType<ForbiddenResponse>
-
-
-
-export function useListAdminActionOptions<TData = Awaited<ReturnType<typeof listAdminActionOptions>>, TError = ErrorType<ForbiddenResponse>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getListAdminActionOptionsQueryOptions(options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
-
 export const getCreateAdminActionUrl = () => {
 
 
 
 
-  return `/api/admin/action-options`
+  return `/api/admin/actions`
 }
 
 export const createAdminAction = async (actionInput: ActionInput, options?: Parameters<typeof customFetch>[1]): Promise<AdminAction> => {
@@ -1039,6 +980,77 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCreateAdminActionMutationOptions(options));
     }
+
+export const getListAdminActionOptionsUrl = () => {
+
+
+
+
+  return `/api/admin/action-options`
+}
+
+export const listAdminActionOptions = async ( options?: Parameters<typeof customFetch>[1]): Promise<ActionOption[]> => {
+
+  return customFetch<ActionOption[]>(getListAdminActionOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminActionOptionsQueryKey = () => {
+    return [
+    `/api/admin/action-options`
+    ] as const;
+    }
+
+
+export const getListAdminActionOptionsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminActionOptions>>, TError = ErrorType<ForbiddenResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminActionOptionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminActionOptions>>> = ({ signal }) => listAdminActionOptions({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminActionOptionsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminActionOptions>>>
+export type ListAdminActionOptionsQueryError = ErrorType<ForbiddenResponse>
+
+
+
+export function useListAdminActionOptions<TData = Awaited<ReturnType<typeof listAdminActionOptions>>, TError = ErrorType<ForbiddenResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminActionOptions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminActionOptionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getUpdateAdminActionUrl = (id: string,) => {
 
@@ -1651,6 +1663,1305 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateAdminUserRoleMutationOptions(options));
     }
+
+export const getGetPublicPortalPageUrl = (slug: string,) => {
+
+
+
+
+  return `/api/public/portal/pages/${slug}`
+}
+
+export const getPublicPortalPage = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<PortalPagePublic> => {
+
+  return customFetch<PortalPagePublic>(getGetPublicPortalPageUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicPortalPageQueryKey = (slug: string,) => {
+    return [
+    `/api/public/portal/pages/${slug}`
+    ] as const;
+    }
+
+
+export const getGetPublicPortalPageQueryOptions = <TData = Awaited<ReturnType<typeof getPublicPortalPage>>, TError = ErrorType<void>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicPortalPageQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicPortalPage>>> = ({ signal }) => getPublicPortalPage(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalPage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicPortalPageQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicPortalPage>>>
+export type GetPublicPortalPageQueryError = ErrorType<void>
+
+
+
+export function useGetPublicPortalPage<TData = Awaited<ReturnType<typeof getPublicPortalPage>>, TError = ErrorType<void>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicPortalPageQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListPublicPortalPagesUrl = () => {
+
+
+
+
+  return `/api/public/portal/pages`
+}
+
+export const listPublicPortalPages = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortalNavItem[]> => {
+
+  return customFetch<PortalNavItem[]>(getListPublicPortalPagesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPublicPortalPagesQueryKey = () => {
+    return [
+    `/api/public/portal/pages`
+    ] as const;
+    }
+
+
+export const getListPublicPortalPagesQueryOptions = <TData = Awaited<ReturnType<typeof listPublicPortalPages>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicPortalPages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPublicPortalPagesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPublicPortalPages>>> = ({ signal }) => listPublicPortalPages({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPublicPortalPages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPublicPortalPagesQueryResult = NonNullable<Awaited<ReturnType<typeof listPublicPortalPages>>>
+export type ListPublicPortalPagesQueryError = ErrorType<unknown>
+
+
+
+export function useListPublicPortalPages<TData = Awaited<ReturnType<typeof listPublicPortalPages>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPublicPortalPages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPublicPortalPagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPublicPortalSettingsUrl = () => {
+
+
+
+
+  return `/api/public/portal/settings`
+}
+
+export const getPublicPortalSettings = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortalSettings> => {
+
+  return customFetch<PortalSettings>(getGetPublicPortalSettingsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicPortalSettingsQueryKey = () => {
+    return [
+    `/api/public/portal/settings`
+    ] as const;
+    }
+
+
+export const getGetPublicPortalSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getPublicPortalSettings>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicPortalSettingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicPortalSettings>>> = ({ signal }) => getPublicPortalSettings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalSettings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicPortalSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicPortalSettings>>>
+export type GetPublicPortalSettingsQueryError = ErrorType<unknown>
+
+
+
+export function useGetPublicPortalSettings<TData = Awaited<ReturnType<typeof getPublicPortalSettings>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicPortalSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPublicPortalMediaUrl = (id: string,) => {
+
+
+
+
+  return `/api/public/portal/media/${id}`
+}
+
+export const getPublicPortalMedia = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getGetPublicPortalMediaUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicPortalMediaQueryKey = (id: string,) => {
+    return [
+    `/api/public/portal/media/${id}`
+    ] as const;
+    }
+
+
+export const getGetPublicPortalMediaQueryOptions = <TData = Awaited<ReturnType<typeof getPublicPortalMedia>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicPortalMediaQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicPortalMedia>>> = ({ signal }) => getPublicPortalMedia(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalMedia>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicPortalMediaQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicPortalMedia>>>
+export type GetPublicPortalMediaQueryError = ErrorType<void>
+
+
+
+export function useGetPublicPortalMedia<TData = Awaited<ReturnType<typeof getPublicPortalMedia>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPortalMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicPortalMediaQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListAdminPortalPagesUrl = () => {
+
+
+
+
+  return `/api/admin/portal/pages`
+}
+
+export const listAdminPortalPages = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortalPage[]> => {
+
+  return customFetch<PortalPage[]>(getListAdminPortalPagesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminPortalPagesQueryKey = () => {
+    return [
+    `/api/admin/portal/pages`
+    ] as const;
+    }
+
+
+export const getListAdminPortalPagesQueryOptions = <TData = Awaited<ReturnType<typeof listAdminPortalPages>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminPortalPages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminPortalPagesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminPortalPages>>> = ({ signal }) => listAdminPortalPages({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminPortalPages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminPortalPagesQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminPortalPages>>>
+export type ListAdminPortalPagesQueryError = ErrorType<unknown>
+
+
+
+export function useListAdminPortalPages<TData = Awaited<ReturnType<typeof listAdminPortalPages>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminPortalPages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminPortalPagesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateAdminPortalPageUrl = () => {
+
+
+
+
+  return `/api/admin/portal/pages`
+}
+
+export const createAdminPortalPage = async (portalPageInput: PortalPageInput, options?: Parameters<typeof customFetch>[1]): Promise<PortalPage> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortalPage>(getCreateAdminPortalPageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(portalPageInput)
+  }
+);}
+
+
+
+
+
+export const getCreateAdminPortalPageMutationKey = () => ['createAdminPortalPage'] as const;
+
+export const getCreateAdminPortalPageMutationOptions = <TError = ErrorType<BadRequestResponse | void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminPortalPage>>, TError,CreateAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminPortalPage>>, TError,CreateAdminPortalPageMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdminPortalPageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminPortalPage>>, CreateAdminPortalPageMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminPortalPage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminPortalPageMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminPortalPage>>>
+    export type CreateAdminPortalPageMutationBody = BodyType<PortalPageInput>
+    export type CreateAdminPortalPageMutationError = ErrorType<BadRequestResponse | void>
+    export type CreateAdminPortalPageMutationVariables = {data: BodyType<PortalPageInput>}
+
+    export const useCreateAdminPortalPage = <TError = ErrorType<BadRequestResponse | void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminPortalPage>>, TError,CreateAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminPortalPage>>,
+        TError,
+        CreateAdminPortalPageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdminPortalPageMutationOptions(options));
+    }
+
+export const getGetAdminPortalPageUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/portal/pages/${id}`
+}
+
+export const getAdminPortalPage = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PortalPage> => {
+
+  return customFetch<PortalPage>(getGetAdminPortalPageUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminPortalPageQueryKey = (id: string,) => {
+    return [
+    `/api/admin/portal/pages/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdminPortalPageQueryOptions = <TData = Awaited<ReturnType<typeof getAdminPortalPage>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminPortalPageQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminPortalPage>>> = ({ signal }) => getAdminPortalPage(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalPage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminPortalPageQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminPortalPage>>>
+export type GetAdminPortalPageQueryError = ErrorType<unknown>
+
+
+
+export function useGetAdminPortalPage<TData = Awaited<ReturnType<typeof getAdminPortalPage>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalPage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminPortalPageQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateAdminPortalPageUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/portal/pages/${id}`
+}
+
+export const updateAdminPortalPage = async (id: string,
+    portalPageUpdate: PortalPageUpdate, options?: Parameters<typeof customFetch>[1]): Promise<PortalPage> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortalPage>(getUpdateAdminPortalPageUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(portalPageUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdminPortalPageMutationKey = () => ['updateAdminPortalPage'] as const;
+
+export const getUpdateAdminPortalPageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminPortalPage>>, TError,UpdateAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminPortalPage>>, TError,UpdateAdminPortalPageMutationVariables, TContext> => {
+
+const mutationKey = getUpdateAdminPortalPageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminPortalPage>>, UpdateAdminPortalPageMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminPortalPage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminPortalPageMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminPortalPage>>>
+    export type UpdateAdminPortalPageMutationBody = BodyType<PortalPageUpdate>
+    export type UpdateAdminPortalPageMutationError = ErrorType<void>
+    export type UpdateAdminPortalPageMutationVariables = {id: string;data: BodyType<PortalPageUpdate>}
+
+    export const useUpdateAdminPortalPage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminPortalPage>>, TError,UpdateAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminPortalPage>>,
+        TError,
+        UpdateAdminPortalPageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateAdminPortalPageMutationOptions(options));
+    }
+
+export const getPublishAdminPortalPageUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/portal/pages/${id}/publish`
+}
+
+export const publishAdminPortalPage = async (id: string,
+    expectedVersion: ExpectedVersion, options?: Parameters<typeof customFetch>[1]): Promise<PortalPage> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortalPage>(getPublishAdminPortalPageUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(expectedVersion)
+  }
+);}
+
+
+
+
+
+export const getPublishAdminPortalPageMutationKey = () => ['publishAdminPortalPage'] as const;
+
+export const getPublishAdminPortalPageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAdminPortalPage>>, TError,PublishAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishAdminPortalPage>>, TError,PublishAdminPortalPageMutationVariables, TContext> => {
+
+const mutationKey = getPublishAdminPortalPageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishAdminPortalPage>>, PublishAdminPortalPageMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  publishAdminPortalPage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PublishAdminPortalPageMutationResult = NonNullable<Awaited<ReturnType<typeof publishAdminPortalPage>>>
+    export type PublishAdminPortalPageMutationBody = BodyType<ExpectedVersion>
+    export type PublishAdminPortalPageMutationError = ErrorType<unknown>
+    export type PublishAdminPortalPageMutationVariables = {id: string;data: BodyType<ExpectedVersion>}
+
+    export const usePublishAdminPortalPage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAdminPortalPage>>, TError,PublishAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof publishAdminPortalPage>>,
+        TError,
+        PublishAdminPortalPageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPublishAdminPortalPageMutationOptions(options));
+    }
+
+export const getUnpublishAdminPortalPageUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/portal/pages/${id}/unpublish`
+}
+
+export const unpublishAdminPortalPage = async (id: string,
+    expectedVersion: ExpectedVersion, options?: Parameters<typeof customFetch>[1]): Promise<PortalPage> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortalPage>(getUnpublishAdminPortalPageUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(expectedVersion)
+  }
+);}
+
+
+
+
+
+export const getUnpublishAdminPortalPageMutationKey = () => ['unpublishAdminPortalPage'] as const;
+
+export const getUnpublishAdminPortalPageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unpublishAdminPortalPage>>, TError,UnpublishAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unpublishAdminPortalPage>>, TError,UnpublishAdminPortalPageMutationVariables, TContext> => {
+
+const mutationKey = getUnpublishAdminPortalPageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unpublishAdminPortalPage>>, UnpublishAdminPortalPageMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  unpublishAdminPortalPage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnpublishAdminPortalPageMutationResult = NonNullable<Awaited<ReturnType<typeof unpublishAdminPortalPage>>>
+    export type UnpublishAdminPortalPageMutationBody = BodyType<ExpectedVersion>
+    export type UnpublishAdminPortalPageMutationError = ErrorType<unknown>
+    export type UnpublishAdminPortalPageMutationVariables = {id: string;data: BodyType<ExpectedVersion>}
+
+    export const useUnpublishAdminPortalPage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unpublishAdminPortalPage>>, TError,UnpublishAdminPortalPageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof unpublishAdminPortalPage>>,
+        TError,
+        UnpublishAdminPortalPageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUnpublishAdminPortalPageMutationOptions(options));
+    }
+
+export const getGetAdminPortalSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/portal/settings`
+}
+
+export const getAdminPortalSettings = async ( options?: Parameters<typeof customFetch>[1]): Promise<PortalSettingsAdmin> => {
+
+  return customFetch<PortalSettingsAdmin>(getGetAdminPortalSettingsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminPortalSettingsQueryKey = () => {
+    return [
+    `/api/admin/portal/settings`
+    ] as const;
+    }
+
+
+export const getGetAdminPortalSettingsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminPortalSettings>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminPortalSettingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminPortalSettings>>> = ({ signal }) => getAdminPortalSettings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalSettings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminPortalSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminPortalSettings>>>
+export type GetAdminPortalSettingsQueryError = ErrorType<unknown>
+
+
+
+export function useGetAdminPortalSettings<TData = Awaited<ReturnType<typeof getAdminPortalSettings>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalSettings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminPortalSettingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateAdminPortalSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/portal/settings`
+}
+
+export const updateAdminPortalSettings = async (portalSettingsUpdate: PortalSettingsUpdate, options?: Parameters<typeof customFetch>[1]): Promise<PortalSettingsAdmin> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortalSettingsAdmin>(getUpdateAdminPortalSettingsUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(portalSettingsUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdminPortalSettingsMutationKey = () => ['updateAdminPortalSettings'] as const;
+
+export const getUpdateAdminPortalSettingsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminPortalSettings>>, TError,UpdateAdminPortalSettingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminPortalSettings>>, TError,UpdateAdminPortalSettingsMutationVariables, TContext> => {
+
+const mutationKey = getUpdateAdminPortalSettingsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminPortalSettings>>, UpdateAdminPortalSettingsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateAdminPortalSettings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminPortalSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminPortalSettings>>>
+    export type UpdateAdminPortalSettingsMutationBody = BodyType<PortalSettingsUpdate>
+    export type UpdateAdminPortalSettingsMutationError = ErrorType<unknown>
+    export type UpdateAdminPortalSettingsMutationVariables = {data: BodyType<PortalSettingsUpdate>}
+
+    export const useUpdateAdminPortalSettings = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminPortalSettings>>, TError,UpdateAdminPortalSettingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminPortalSettings>>,
+        TError,
+        UpdateAdminPortalSettingsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateAdminPortalSettingsMutationOptions(options));
+    }
+
+export const getPublishAdminPortalSettingsUrl = () => {
+
+
+
+
+  return `/api/admin/portal/settings/publish`
+}
+
+export const publishAdminPortalSettings = async (expectedVersion: ExpectedVersion, options?: Parameters<typeof customFetch>[1]): Promise<PortalSettingsAdmin> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortalSettingsAdmin>(getPublishAdminPortalSettingsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(expectedVersion)
+  }
+);}
+
+
+
+
+
+export const getPublishAdminPortalSettingsMutationKey = () => ['publishAdminPortalSettings'] as const;
+
+export const getPublishAdminPortalSettingsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAdminPortalSettings>>, TError,PublishAdminPortalSettingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishAdminPortalSettings>>, TError,PublishAdminPortalSettingsMutationVariables, TContext> => {
+
+const mutationKey = getPublishAdminPortalSettingsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishAdminPortalSettings>>, PublishAdminPortalSettingsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  publishAdminPortalSettings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PublishAdminPortalSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof publishAdminPortalSettings>>>
+    export type PublishAdminPortalSettingsMutationBody = BodyType<ExpectedVersion>
+    export type PublishAdminPortalSettingsMutationError = ErrorType<unknown>
+    export type PublishAdminPortalSettingsMutationVariables = {data: BodyType<ExpectedVersion>}
+
+    export const usePublishAdminPortalSettings = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishAdminPortalSettings>>, TError,PublishAdminPortalSettingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof publishAdminPortalSettings>>,
+        TError,
+        PublishAdminPortalSettingsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPublishAdminPortalSettingsMutationOptions(options));
+    }
+
+export const getCreateAdminPortalMediaUploadUrl = () => {
+
+
+
+
+  return `/api/admin/portal/media/upload-url`
+}
+
+export const createAdminPortalMediaUpload = async (portalMediaUpload: PortalMediaUpload, options?: Parameters<typeof customFetch>[1]): Promise<PortalMediaUploadResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PortalMediaUploadResponse>(getCreateAdminPortalMediaUploadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(portalMediaUpload)
+  }
+);}
+
+
+
+
+
+export const getCreateAdminPortalMediaUploadMutationKey = () => ['createAdminPortalMediaUpload'] as const;
+
+export const getCreateAdminPortalMediaUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminPortalMediaUpload>>, TError,CreateAdminPortalMediaUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminPortalMediaUpload>>, TError,CreateAdminPortalMediaUploadMutationVariables, TContext> => {
+
+const mutationKey = getCreateAdminPortalMediaUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminPortalMediaUpload>>, CreateAdminPortalMediaUploadMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminPortalMediaUpload(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminPortalMediaUploadMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminPortalMediaUpload>>>
+    export type CreateAdminPortalMediaUploadMutationBody = BodyType<PortalMediaUpload>
+    export type CreateAdminPortalMediaUploadMutationError = ErrorType<unknown>
+    export type CreateAdminPortalMediaUploadMutationVariables = {data: BodyType<PortalMediaUpload>}
+
+    export const useCreateAdminPortalMediaUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminPortalMediaUpload>>, TError,CreateAdminPortalMediaUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminPortalMediaUpload>>,
+        TError,
+        CreateAdminPortalMediaUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateAdminPortalMediaUploadMutationOptions(options));
+    }
+
+export const getConfirmAdminPortalMediaUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/portal/media/${id}/confirm`
+}
+
+export const confirmAdminPortalMedia = async (id: string,
+    portalMediaConfirm: PortalMediaConfirm, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<void>(getConfirmAdminPortalMediaUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(portalMediaConfirm)
+  }
+);}
+
+
+
+
+
+export const getConfirmAdminPortalMediaMutationKey = () => ['confirmAdminPortalMedia'] as const;
+
+export const getConfirmAdminPortalMediaMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmAdminPortalMedia>>, TError,ConfirmAdminPortalMediaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmAdminPortalMedia>>, TError,ConfirmAdminPortalMediaMutationVariables, TContext> => {
+
+const mutationKey = getConfirmAdminPortalMediaMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmAdminPortalMedia>>, ConfirmAdminPortalMediaMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  confirmAdminPortalMedia(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmAdminPortalMediaMutationResult = NonNullable<Awaited<ReturnType<typeof confirmAdminPortalMedia>>>
+    export type ConfirmAdminPortalMediaMutationBody = BodyType<PortalMediaConfirm>
+    export type ConfirmAdminPortalMediaMutationError = ErrorType<unknown>
+    export type ConfirmAdminPortalMediaMutationVariables = {id: string;data: BodyType<PortalMediaConfirm>}
+
+    export const useConfirmAdminPortalMedia = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmAdminPortalMedia>>, TError,ConfirmAdminPortalMediaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof confirmAdminPortalMedia>>,
+        TError,
+        ConfirmAdminPortalMediaMutationVariables,
+        TContext
+      > => {
+      return useMutation(getConfirmAdminPortalMediaMutationOptions(options));
+    }
+
+export const getListAdminPortalMediaUrl = () => {
+
+
+
+
+  return `/api/admin/portal/media`
+}
+
+export const listAdminPortalMedia = async ( options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getListAdminPortalMediaUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminPortalMediaQueryKey = () => {
+    return [
+    `/api/admin/portal/media`
+    ] as const;
+    }
+
+
+export const getListAdminPortalMediaQueryOptions = <TData = Awaited<ReturnType<typeof listAdminPortalMedia>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminPortalMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminPortalMediaQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminPortalMedia>>> = ({ signal }) => listAdminPortalMedia({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminPortalMedia>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminPortalMediaQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminPortalMedia>>>
+export type ListAdminPortalMediaQueryError = ErrorType<unknown>
+
+
+
+export function useListAdminPortalMedia<TData = Awaited<ReturnType<typeof listAdminPortalMedia>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminPortalMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminPortalMediaQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetAdminPortalMediaUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/portal/media/${id}`
+}
+
+export const getAdminPortalMedia = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getGetAdminPortalMediaUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminPortalMediaQueryKey = (id: string,) => {
+    return [
+    `/api/admin/portal/media/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdminPortalMediaQueryOptions = <TData = Awaited<ReturnType<typeof getAdminPortalMedia>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminPortalMediaQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminPortalMedia>>> = ({ signal }) => getAdminPortalMedia(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalMedia>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminPortalMediaQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminPortalMedia>>>
+export type GetAdminPortalMediaQueryError = ErrorType<unknown>
+
+
+
+export function useGetAdminPortalMedia<TData = Awaited<ReturnType<typeof getAdminPortalMedia>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminPortalMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminPortalMediaQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getListAdminAuditLogsUrl = () => {
 

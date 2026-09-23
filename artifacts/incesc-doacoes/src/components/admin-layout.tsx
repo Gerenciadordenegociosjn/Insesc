@@ -8,7 +8,9 @@ import {
   Users,
   LogOut,
   Target,
-  ShieldAlert
+  ShieldAlert,
+  LayoutTemplate,
+  Settings,
 } from "lucide-react";
 import logoUrl from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
@@ -59,9 +61,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     ...(hasRole(["administrator", "content", "auditor"]) ? [{ href: "/admin/actions", label: "Ações e Campanhas", icon: Target }] : []),
     ...(hasRole(["administrator", "financial", "auditor"]) ? [{ href: "/admin/donations", label: "Doações", icon: HeartHandshake }] : []),
     ...(hasRole(["administrator", "financial", "transparency", "auditor"]) ? [{ href: "/admin/expenses", label: "Despesas", icon: Receipt }] : []),
+    ...(hasRole(["administrator", "content", "auditor"]) ? [
+      { href: "/admin/portal", label: "Páginas do Portal", icon: LayoutTemplate },
+      { href: "/admin/portal/settings", label: "Configurações do Portal", icon: Settings },
+    ] : []),
     ...(hasRole(["administrator"]) ? [{ href: "/admin/users", label: "Equipe e Usuários", icon: Users }] : []),
     ...(hasRole(["administrator", "auditor"]) ? [{ href: "/admin/audit-logs", label: "Auditoria", icon: ShieldAlert }] : []),
   ];
+
+  const handleNav = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if ((window as any).__hasUnsavedChanges) {
+      if (!confirm("Você tem alterações não salvas. Deseja sair mesmo assim?")) {
+        e.preventDefault();
+        return;
+      }
+      (window as any).__hasUnsavedChanges = false;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col md:flex-row font-sans">
@@ -77,6 +93,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             return (
               <Link key={item.href} href={item.href}>
                 <a
+                  onClick={(e) => handleNav(e, item.href)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                     isActive 
                       ? "bg-primary text-primary-foreground font-bold" 

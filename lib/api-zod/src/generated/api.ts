@@ -159,13 +159,6 @@ export const ListAdminActionsResponseItem = zod.object({
 export const ListAdminActionsResponse = zod.array(ListAdminActionsResponseItem)
 
 
-export const ListAdminActionOptionsResponseItem = zod.object({
-  "id": zod.string().uuid(),
-  "title": zod.string()
-})
-export const ListAdminActionOptionsResponse = zod.array(ListAdminActionOptionsResponseItem)
-
-
 
 
 
@@ -198,6 +191,13 @@ export const CreateAdminActionResponse = zod.object({
   "internalDescription": zod.string().nullish(),
   "createdAt": zod.coerce.date().optional()
 }))
+
+
+export const ListAdminActionOptionsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "title": zod.string()
+})
+export const ListAdminActionOptionsResponse = zod.array(ListAdminActionOptionsResponseItem)
 
 
 export const UpdateAdminActionParams = zod.object({
@@ -372,6 +372,348 @@ export const UpdateAdminUserRoleResponse = zod.object({
   "role": zod.string(),
   "active": zod.boolean()
 })
+
+
+export const GetPublicPortalPageParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+
+
+
+export const GetPublicPortalPageResponse = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+})),
+  "status": zod.enum(['draft', 'published']),
+  "version": zod.number().int(),
+  "publishedAt": zod.coerce.date().nullish()
+}).and(zod.object({
+  "media": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "altText": zod.string(),
+  "contentType": zod.string(),
+  "url": zod.string()
+})).optional()
+}))
+
+
+export const ListPublicPortalPagesResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string()
+})
+export const ListPublicPortalPagesResponse = zod.array(ListPublicPortalPagesResponseItem)
+
+
+export const GetPublicPortalSettingsResponse = zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+})
+
+
+export const GetPublicPortalMediaParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const GetPublicPortalMediaResponse = zod.unknown()
+
+
+
+
+
+export const ListAdminPortalPagesResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+})),
+  "status": zod.enum(['draft', 'published']),
+  "version": zod.number().int(),
+  "publishedAt": zod.coerce.date().nullish()
+})
+export const ListAdminPortalPagesResponse = zod.array(ListAdminPortalPagesResponseItem)
+
+
+export const createAdminPortalPageBodySlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+
+
+export const CreateAdminPortalPageBody = zod.object({
+  "slug": zod.string().regex(createAdminPortalPageBodySlugRegExp),
+  "title": zod.string().min(1),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+}))
+})
+
+
+
+
+export const CreateAdminPortalPageResponse = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+})),
+  "status": zod.enum(['draft', 'published']),
+  "version": zod.number().int(),
+  "publishedAt": zod.coerce.date().nullish()
+})
+
+
+export const GetAdminPortalPageParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+
+
+
+export const GetAdminPortalPageResponse = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+})),
+  "status": zod.enum(['draft', 'published']),
+  "version": zod.number().int(),
+  "publishedAt": zod.coerce.date().nullish()
+})
+
+
+export const UpdateAdminPortalPageParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const updateAdminPortalPageBodyOneSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+
+
+
+export const UpdateAdminPortalPageBody = zod.object({
+  "slug": zod.string().regex(updateAdminPortalPageBodyOneSlugRegExp),
+  "title": zod.string().min(1),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+}))
+}).and(zod.object({
+  "expectedVersion": zod.number().int().min(1)
+})).describe('Fields may be omitted except expectedVersion.')
+
+
+
+
+export const UpdateAdminPortalPageResponse = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+})),
+  "status": zod.enum(['draft', 'published']),
+  "version": zod.number().int(),
+  "publishedAt": zod.coerce.date().nullish()
+})
+
+
+export const PublishAdminPortalPageParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+
+
+
+export const PublishAdminPortalPageBody = zod.object({
+  "expectedVersion": zod.number().int().min(1)
+})
+
+
+
+
+export const PublishAdminPortalPageResponse = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+})),
+  "status": zod.enum(['draft', 'published']),
+  "version": zod.number().int(),
+  "publishedAt": zod.coerce.date().nullish()
+})
+
+
+export const UnpublishAdminPortalPageParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+
+
+
+export const UnpublishAdminPortalPageBody = zod.object({
+  "expectedVersion": zod.number().int().min(1)
+})
+
+
+
+
+export const UnpublishAdminPortalPageResponse = zod.object({
+  "id": zod.string().uuid(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "blocks": zod.array(zod.object({
+  "id": zod.string().min(1),
+  "type": zod.enum(['hero', 'banner', 'text', 'image', 'split', 'cards', 'gallery', 'system'])
+})),
+  "status": zod.enum(['draft', 'published']),
+  "version": zod.number().int(),
+  "publishedAt": zod.coerce.date().nullish()
+})
+
+
+export const GetAdminPortalSettingsResponse = zod.object({
+  "draft": zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+}),
+  "published": zod.union([zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+}),zod.null()]),
+  "version": zod.number().int()
+})
+
+
+
+
+
+export const UpdateAdminPortalSettingsBody = zod.object({
+  "draft": zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+}),
+  "expectedVersion": zod.number().int().min(1)
+})
+
+export const UpdateAdminPortalSettingsResponse = zod.object({
+  "draft": zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+}),
+  "published": zod.union([zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+}),zod.null()]),
+  "version": zod.number().int()
+})
+
+
+
+
+
+export const PublishAdminPortalSettingsBody = zod.object({
+  "expectedVersion": zod.number().int().min(1)
+})
+
+export const PublishAdminPortalSettingsResponse = zod.object({
+  "draft": zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+}),
+  "published": zod.union([zod.object({
+  "footerInstitutional": zod.string(),
+  "officialLinks": zod.array(zod.object({
+  "label": zod.string(),
+  "href": zod.string()
+})),
+  "contact": zod.record(zod.string(), zod.string())
+}),zod.null()]),
+  "version": zod.number().int()
+})
+
+
+export const createAdminPortalMediaUploadBodySizeMax = 8388608;
+
+
+
+export const CreateAdminPortalMediaUploadBody = zod.object({
+  "name": zod.string(),
+  "size": zod.number().int().min(1).max(createAdminPortalMediaUploadBodySizeMax),
+  "contentType": zod.enum(['image/png', 'image/jpeg', 'image/webp'])
+})
+
+export const CreateAdminPortalMediaUploadResponse = zod.object({
+  "id": zod.string().uuid(),
+  "uploadURL": zod.string().url()
+})
+
+
+export const ConfirmAdminPortalMediaParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+
+
+
+export const ConfirmAdminPortalMediaBody = zod.object({
+  "altText": zod.string().min(1)
+})
+
+export const ConfirmAdminPortalMediaResponse = zod.unknown()
+
+
+export const ListAdminPortalMediaResponse = zod.unknown()
+
+
+export const GetAdminPortalMediaParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const GetAdminPortalMediaResponse = zod.unknown()
 
 
 export const ListAdminAuditLogsResponseItem = zod.object({

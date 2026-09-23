@@ -341,3 +341,191 @@ export function useAdminAuditLogs() {
     queryFn: () => fetcher<any[]>("/admin/audit-logs"),
   });
 }
+
+// ---------------------------------
+// Portal Admin API
+// ---------------------------------
+
+export interface PortalBlock {
+  type: string;
+  id: string;
+  [key: string]: any;
+}
+
+export interface PortalPage {
+  id: string;
+  slug: string;
+  title: string;
+  status: "draft" | "published";
+  blocks: PortalBlock[];
+  version: number;
+  publishedAt?: string | null;
+  media?: PortalMedia[];
+}
+
+export interface PortalMedia {
+  id: string;
+  altText: string;
+  url?: string;
+  status?: "pending" | "confirmed";
+}
+
+export interface PortalSettings {
+  footerInstitutional: string;
+  officialLinks: { label: string; href: string }[];
+  contact: { email?: string; phone?: string; address?: string };
+}
+
+export interface PortalSettingsResponse {
+  draft: PortalSettings;
+  published: PortalSettings | null;
+  version: number;
+}
+
+export function useAdminPortalPages() {
+  return useQuery({
+    queryKey: ["admin", "portal", "pages"],
+    queryFn: () => fetcher<PortalPage[]>("/admin/portal/pages"),
+  });
+}
+
+export function useAdminPortalPage(id: string) {
+  return useQuery({
+    queryKey: ["admin", "portal", "pages", id],
+    queryFn: () => fetcher<PortalPage>(`/admin/portal/pages/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCreatePortalPage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { slug: string; title: string; blocks: PortalBlock[] }) =>
+      fetcher<PortalPage>("/admin/portal/pages", { method: "POST", json: data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "portal", "pages"] });
+    },
+  });
+}
+
+export function useUpdatePortalPage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { slug: string; title: string; blocks: PortalBlock[]; expectedVersion?: number } }) =>
+      fetcher<PortalPage>(`/admin/portal/pages/${id}`, { method: "PATCH", json: data }),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "portal", "pages"] });
+      queryClient.setQueryData(["admin", "portal", "pages", updated.id], updated);
+    },
+  });
+}
+
+export function usePublishPortalPage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, expectedVersion }: { id: string; expectedVersion: number }) =>
+      fetcher<PortalPage>(`/admin/portal/pages/${id}/publish`, { method: "POST", json: { expectedVersion } }),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "portal", "pages"] });
+      queryClient.setQueryData(["admin", "portal", "pages", updated.id], updated);
+      queryClient.invalidateQueries({ queryKey: ["public", "portal", "pages", updated.slug] });
+      queryClient.invalidateQueries({ queryKey: ["public", "portal", "pages"] });
+    },
+  });
+}
+
+export function useUnpublishPortalPage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, expectedVersion }: { id: string; expectedVersion: number }) =>
+      fetcher<PortalPage>(`/admin/portal/pages/${id}/unpublish`, { method: "POST", json: { expectedVersion } }),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "portal", "pages"] });
+      queryClient.setQueryData(["admin", "portal", "pages", updated.id], updated);
+      queryClient.invalidateQueries({ queryKey: ["public", "portal", "pages", updated.slug] });
+      queryClient.invalidateQueries({ queryKey: ["public", "portal", "pages"] });
+    },
+  });
+}
+
+export function useAdminPortalSettings() {
+  return useQuery({
+    queryKey: ["admin", "portal", "settings"],
+    queryFn: () => fetcher<PortalSettingsResponse>("/admin/portal/settings"),
+  });
+}
+
+export function useUpdatePortalSettings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { draft: PortalSettings; expectedVersion: number }) =>
+      fetcher<PortalSettingsResponse>("/admin/portal/settings", { method: "PATCH", json: data }),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(["admin", "portal", "settings"], updated);
+    },
+  });
+}
+
+export function usePublishPortalSettings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { expectedVersion: number }) =>
+      fetcher<PortalSettingsResponse>("/admin/portal/settings/publish", { method: "POST", json: data }),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(["admin", "portal", "settings"], updated);
+      queryClient.invalidateQueries({ queryKey: ["public", "portal", "settings"] });
+    },
+  });
+}
+
+export function useAdminPortalMedia() {
+  return useQuery({
+    queryKey: ["admin", "portal", "media"],
+    queryFn: () => fetcher<PortalMedia[]>("/admin/portal/media"),
+  });
+}
+
+export function useRequestMediaUploadUrl() {
+  return useMutation({
+    mutationFn: (data: { name: string; size: number; contentType: string }) =>
+      fetcher<{ id: string; uploadURL: string }>("/admin/portal/media/upload-url", { method: "POST", json: data }),
+  });
+}
+
+export function useConfirmMediaUpload() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, altText }: { id: string; altText: string }) =>
+      fetcher<PortalMedia>(`/admin/portal/media/${id}/confirm`, { method: "POST", json: { altText } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "portal", "media"] });
+    },
+  });
+}
+
+// ---------------------------------
+// Portal Public API
+// ---------------------------------
+
+export function usePublicPortalPage(slug: string) {
+  return useQuery({
+    queryKey: ["public", "portal", "pages", slug],
+    queryFn: () => fetcher<PortalPage>(`/public/portal/pages/${slug}`),
+    retry: false, // Don't retry on 404
+  });
+}
+
+export function usePublicPortalPages() {
+  return useQuery({
+    queryKey: ["public", "portal", "pages"],
+    queryFn: () => fetcher<{ id: string; slug: string; title: string }[]>("/public/portal/pages"),
+  });
+}
+
+export function usePublicPortalSettings() {
+  return useQuery({
+    queryKey: ["public", "portal", "settings"],
+    queryFn: () => fetcher<PortalSettings>("/public/portal/settings"),
+  });
+}
+

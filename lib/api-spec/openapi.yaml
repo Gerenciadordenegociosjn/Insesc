@@ -167,19 +167,6 @@ paths:
                 items: { $ref: "#/components/schemas/AdminAction" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
-  /admin/action-options:
-    get:
-      operationId: listAdminActionOptions
-      tags: [admin]
-      responses:
-        "200":
-          description: Safe action choices for expense workflows
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: "#/components/schemas/ActionOption" }
-        "403": { $ref: "#/components/responses/Forbidden" }
     post:
       operationId: createAdminAction
       tags: [admin]
@@ -195,6 +182,19 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/AdminAction" }
         "400": { $ref: "#/components/responses/BadRequest" }
+  /admin/action-options:
+    get:
+      operationId: listAdminActionOptions
+      tags: [admin]
+      responses:
+        "200":
+          description: Safe action choices for expense workflows
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ActionOption" }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /admin/actions/{id}:
     patch:
       operationId: updateAdminAction
@@ -310,6 +310,116 @@ paths:
               schema: { $ref: "#/components/schemas/AdminUser" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "403": { $ref: "#/components/responses/Forbidden" }
+  /public/portal/pages/{slug}:
+    get:
+      operationId: getPublicPortalPage
+      tags: [public]
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Published page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPagePublic" } } } }
+        "404": { description: Page not found }
+  /public/portal/pages:
+    get:
+      operationId: listPublicPortalPages
+      tags: [public]
+      responses:
+        "200": { description: Published custom navigation, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PortalNavItem" } } } } }
+  /public/portal/settings:
+    get:
+      operationId: getPublicPortalSettings
+      tags: [public]
+      responses:
+        "200": { description: Published footer settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettings" } } } }
+  /public/portal/media/{id}:
+    get:
+      operationId: getPublicPortalMedia
+      tags: [public]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "200": { description: Published referenced image }
+        "404": { description: Media not found }
+  /admin/portal/pages:
+    get:
+      operationId: listAdminPortalPages
+      tags: [admin]
+      responses:
+        "200": { description: Portal pages, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PortalPage" } } } } }
+    post:
+      operationId: createAdminPortalPage
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPageInput" } } } }
+      responses:
+        "201": { description: Created page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { description: Slug conflict }
+  /admin/portal/pages/{id}:
+    get:
+      operationId: getAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses: { "200": { description: Portal page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } } }
+    patch:
+      operationId: updateAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPageUpdate" } } } }
+      responses: { "200": { description: Updated page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } }, "409": { description: Version conflict } }
+  /admin/portal/pages/{id}/publish:
+    post:
+      operationId: publishAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpectedVersion" } } } }
+      responses: { "200": { description: Published page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } } }
+  /admin/portal/pages/{id}/unpublish:
+    post:
+      operationId: unpublishAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpectedVersion" } } } }
+      responses: { "200": { description: Unpublished page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } } }
+  /admin/portal/settings:
+    get:
+      operationId: getAdminPortalSettings
+      tags: [admin]
+      responses: { "200": { description: Draft and published settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsAdmin" } } } } }
+    patch:
+      operationId: updateAdminPortalSettings
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsUpdate" } } } }
+      responses: { "200": { description: Updated settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsAdmin" } } } } }
+  /admin/portal/settings/publish:
+    post:
+      operationId: publishAdminPortalSettings
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpectedVersion" } } } }
+      responses: { "200": { description: Published settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsAdmin" } } } } }
+  /admin/portal/media/upload-url:
+    post:
+      operationId: createAdminPortalMediaUpload
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalMediaUpload" } } } }
+      responses: { "201": { description: Upload URL, content: { application/json: { schema: { $ref: "#/components/schemas/PortalMediaUploadResponse" } } } } }
+  /admin/portal/media/{id}/confirm:
+    post:
+      operationId: confirmAdminPortalMedia
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalMediaConfirm" } } } }
+      responses: { "200": { description: Confirmed media } }
+  /admin/portal/media:
+    get:
+      operationId: listAdminPortalMedia
+      tags: [admin]
+      responses: { "200": { description: Media library } }
+  /admin/portal/media/{id}:
+    get:
+      operationId: getAdminPortalMedia
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses: { "200": { description: Media preview } }
   /admin/audit-logs:
     get:
       operationId: listAdminAuditLogs
@@ -595,4 +705,94 @@ components:
         completedActions: { type: integer }
         pendingPayments: { type: integer }
         receiptsAwaitingReview: { type: integer }
+    ExpectedVersion:
+      type: object
+      required: [expectedVersion]
+      additionalProperties: false
+      properties: { expectedVersion: { type: integer, minimum: 1 } }
+    PortalBlock:
+      type: object
+      required: [id, type]
+      additionalProperties: true
+      properties:
+        id: { type: string, minLength: 1 }
+        type: { type: string, enum: [hero, banner, text, image, split, cards, gallery, system] }
+    PortalPageInput:
+      type: object
+      required: [slug, title, blocks]
+      additionalProperties: false
+      properties:
+        slug: { type: string, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+        title: { type: string, minLength: 1 }
+        blocks: { type: array, items: { $ref: "#/components/schemas/PortalBlock" } }
+    PortalPageUpdate:
+      allOf:
+        - $ref: "#/components/schemas/PortalPageInput"
+        - $ref: "#/components/schemas/ExpectedVersion"
+      description: Fields may be omitted except expectedVersion.
+    PortalPage:
+      type: object
+      required: [id, slug, title, blocks, status, version]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        blocks: { type: array, items: { $ref: "#/components/schemas/PortalBlock" } }
+        status: { type: string, enum: [draft, published] }
+        version: { type: integer }
+        publishedAt: { type: ["string", "null"], format: date-time }
+    PortalPagePublic:
+      allOf:
+        - $ref: "#/components/schemas/PortalPage"
+        - type: object
+          properties:
+            media: { type: array, items: { $ref: "#/components/schemas/PortalMediaPublic" } }
+    PortalNavItem:
+      type: object
+      required: [id, slug, title]
+      properties: { id: { type: string, format: uuid }, slug: { type: string }, title: { type: string } }
+    PortalSettings:
+      type: object
+      required: [footerInstitutional, officialLinks, contact]
+      properties:
+        footerInstitutional: { type: string }
+        officialLinks: { type: array, items: { type: object, required: [label, href], properties: { label: { type: string }, href: { type: string } } } }
+        contact: { type: object, additionalProperties: { type: string } }
+    PortalSettingsUpdate:
+      type: object
+      required: [draft, expectedVersion]
+      additionalProperties: false
+      properties:
+        draft: { $ref: "#/components/schemas/PortalSettings" }
+        expectedVersion: { type: integer, minimum: 1 }
+    PortalSettingsAdmin:
+      type: object
+      required: [draft, published, version]
+      properties:
+        draft: { $ref: "#/components/schemas/PortalSettings" }
+        published: { anyOf: [{ $ref: "#/components/schemas/PortalSettings" }, { type: "null" }] }
+        version: { type: integer }
+    PortalMediaUpload:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string }
+        size: { type: integer, minimum: 1, maximum: 8388608 }
+        contentType: { type: string, enum: [image/png, image/jpeg, image/webp] }
+    PortalMediaUploadResponse:
+      type: object
+      required: [id, uploadURL]
+      properties: { id: { type: string, format: uuid }, uploadURL: { type: string, format: uri } }
+    PortalMediaConfirm:
+      type: object
+      required: [altText]
+      properties: { altText: { type: string, minLength: 1 } }
+    PortalMediaPublic:
+      type: object
+      required: [id, altText, contentType, url]
+      properties:
+        id: { type: string, format: uuid }
+        altText: { type: string }
+        contentType: { type: string }
+        url: { type: string }
 

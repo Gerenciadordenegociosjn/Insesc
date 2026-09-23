@@ -1,13 +1,16 @@
-import { SiteHeader } from "@/components/site-header";
+import { useRoute } from "wouter";
 import { usePublicPortalPage } from "@/lib/api";
 import { BlockRenderer } from "@/components/portal-blocks";
+import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { SystemJourney } from "@/components/system-modules";
+import NotFound from "@/pages/not-found";
 
-export default function MinhaJornada() {
-  const { data: page, isLoading: isPageLoading, error: pageError } = usePublicPortalPage("minha-jornada");
+export default function PublicPage() {
+  const [, params] = useRoute("/paginas/:slug");
+  const slug = params?.slug;
+  const { data: page, isLoading, error } = usePublicPortalPage(slug || "");
 
-  if (isPageLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <SiteHeader />
@@ -19,44 +22,36 @@ export default function MinhaJornada() {
     );
   }
 
-  if (pageError && (pageError as any).status !== 404) {
+  if (error && (error as any).status !== 404) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <SiteHeader />
         <main className="flex-1 flex flex-col items-center justify-center text-center p-8">
           <p className="text-destructive font-bold text-xl mb-2">Erro ao carregar o portal</p>
-          <p className="text-muted-foreground">{pageError.message}</p>
+          <p className="text-muted-foreground">{(error as any).message}</p>
         </main>
         <SiteFooter />
       </div>
     );
   }
 
-  const fallbackOriginalContent = (
-    <main className="flex-grow py-16 lg:py-24">
-      <SystemJourney />
-    </main>
-  );
+  // If page not found or not published, show 404
+  if (error || !page || page.status !== 'published') {
+    return <NotFound />;
+  }
 
   return (
     <div className="min-h-screen bg-background font-sans flex flex-col">
       <SiteHeader />
-      
-      {page && page.status === 'published' ? (
-        <main className="flex-grow">
-          {page.blocks.map(block => (
-            <BlockRenderer 
-              key={block.id} 
-              block={block} 
-              mediaList={page.media || []}
-              systemComponents={{ journey: <SystemJourney /> }} 
-            />
-          ))}
-        </main>
-      ) : (
-        fallbackOriginalContent
-      )}
-
+      <main className="flex-1">
+        {page.blocks.map(block => (
+          <BlockRenderer 
+            key={block.id} 
+            block={block} 
+            mediaList={page.media || []}
+          />
+        ))}
+      </main>
       <SiteFooter />
     </div>
   );

@@ -134,3 +134,4 @@ export type Donation = typeof donationsTable.$inferSelect;
 export type Expense = typeof expensesTable.$inferSelect;
 export type AuditLog = typeof auditLogsTable.$inferSelect;
 export type InsertDonationAction = z.infer<typeof insertDonationActionSchema>;
+export * from "./portal";

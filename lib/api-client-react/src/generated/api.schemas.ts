@@ -283,6 +283,135 @@ export interface AdminDashboard {
   receiptsAwaitingReview: number;
 }
 
+export interface ExpectedVersion {
+  /** @minimum 1 */
+  expectedVersion: number;
+}
+
+export type PortalBlockType = typeof PortalBlockType[keyof typeof PortalBlockType];
+
+
+export const PortalBlockType = {
+  hero: 'hero',
+  banner: 'banner',
+  text: 'text',
+  image: 'image',
+  split: 'split',
+  cards: 'cards',
+  gallery: 'gallery',
+  system: 'system',
+} as const;
+
+export interface PortalBlock {
+  /** @minLength 1 */
+  id: string;
+  type: PortalBlockType;
+  [key: string]: unknown;
+ }
+
+export interface PortalPageInput {
+  /** @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$ */
+  slug: string;
+  /** @minLength 1 */
+  title: string;
+  blocks: PortalBlock[];
+}
+
+/**
+ * Fields may be omitted except expectedVersion.
+ */
+export type PortalPageUpdate = PortalPageInput & ExpectedVersion;
+
+export type PortalPageStatus = typeof PortalPageStatus[keyof typeof PortalPageStatus];
+
+
+export const PortalPageStatus = {
+  draft: 'draft',
+  published: 'published',
+} as const;
+
+export interface PortalPage {
+  id: string;
+  slug: string;
+  title: string;
+  blocks: PortalBlock[];
+  status: PortalPageStatus;
+  version: number;
+  /** @nullable */
+  publishedAt?: string | null;
+}
+
+export interface PortalMediaPublic {
+  id: string;
+  altText: string;
+  contentType: string;
+  url: string;
+}
+
+export type PortalPagePublic = PortalPage & {
+  media?: PortalMediaPublic[];
+};
+
+export interface PortalNavItem {
+  id: string;
+  slug: string;
+  title: string;
+}
+
+export type PortalSettingsOfficialLinksItem = {
+  label: string;
+  href: string;
+};
+
+export type PortalSettingsContact = {[key: string]: string};
+
+export interface PortalSettings {
+  footerInstitutional: string;
+  officialLinks: PortalSettingsOfficialLinksItem[];
+  contact: PortalSettingsContact;
+}
+
+export interface PortalSettingsUpdate {
+  draft: PortalSettings;
+  /** @minimum 1 */
+  expectedVersion: number;
+}
+
+export interface PortalSettingsAdmin {
+  draft: PortalSettings;
+  published: PortalSettings | null;
+  version: number;
+}
+
+export type PortalMediaUploadContentType = typeof PortalMediaUploadContentType[keyof typeof PortalMediaUploadContentType];
+
+
+export const PortalMediaUploadContentType = {
+  'image/png': 'image/png',
+  'image/jpeg': 'image/jpeg',
+  'image/webp': 'image/webp',
+} as const;
+
+export interface PortalMediaUpload {
+  name: string;
+  /**
+     * @minimum 1
+     * @maximum 8388608
+     */
+  size: number;
+  contentType: PortalMediaUploadContentType;
+}
+
+export interface PortalMediaUploadResponse {
+  id: string;
+  uploadURL: string;
+}
+
+export interface PortalMediaConfirm {
+  /** @minLength 1 */
+  altText: string;
+}
+
 /**
  * Authentication required
  */

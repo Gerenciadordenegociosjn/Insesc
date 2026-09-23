@@ -15,6 +15,11 @@ import AdminDonations from '@/pages/admin/donations';
 import AdminExpenses from '@/pages/admin/expenses';
 import AdminUsers from '@/pages/admin/users';
 import AdminAuditLogs from '@/pages/admin/audit';
+import AdminPortalPages from '@/pages/admin/portal/pages';
+import AdminPortalSettings from '@/pages/admin/portal/settings';
+import AdminPortalEditor from '@/pages/admin/portal/editor';
+import AdminPortalPreview from '@/pages/admin/portal/preview';
+import PublicPage from '@/pages/public-page';
 import AdminLayout from '@/components/admin-layout';
 import {
   Route,
@@ -94,11 +99,30 @@ function Router() {
             <AdminAuditLogs />
           </AdminLayout>
         </Route>
+        <Route path="/admin/portal/settings">
+          <AdminLayout>
+            <AdminPortalSettings />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin/portal">
+          <AdminLayout>
+            <AdminPortalPages />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin/portal/:id/preview">
+          <AdminPortalPreview />
+        </Route>
+        <Route path="/admin/portal/:id">
+          <AdminLayout>
+            <AdminPortalEditor />
+          </AdminLayout>
+        </Route>
         <Route path="/admin">
           <AdminLayout>
             <AdminDashboard />
           </AdminLayout>
         </Route>
+        <Route path="/paginas/:slug" component={PublicPage} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
