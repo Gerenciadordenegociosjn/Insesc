@@ -1,18 +1,24 @@
 import { useRoute, Link } from "wouter";
-import { useAdminPortalPage, useAdminPortalMedia } from "@/lib/api";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BlockRenderer } from "@/components/portal-blocks";
 import { SystemActions, SystemTransparency, SystemJourney } from "@/components/system-modules";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
+import { useAdminPortalPage, useAdminPortalMedia, useMe } from "@/lib/api";
 
 export default function AdminPortalPreview() {
   const [, params] = useRoute("/admin/portal/:id/preview");
   const id = params?.id;
-  const { data: page, isLoading } = useAdminPortalPage(id || "");
-  const { data: mediaList } = useAdminPortalMedia();
+  const { data: me, isLoading: meLoading } = useMe();
+  const authorized = !!me && ["administrator", "content", "auditor"].includes(me.role);
+  const { data: page, isLoading } = useAdminPortalPage(authorized ? id || "" : "");
+  const { data: mediaList } = useAdminPortalMedia(authorized);
 
+  if (meLoading) return <div className="animate-pulse h-screen bg-muted"></div>;
+  if (!authorized) {
+    return <div className="p-8 text-center text-destructive">Visualização restrita à equipe autorizada.</div>;
+  }
   if (isLoading) return <div className="animate-pulse h-screen bg-muted"></div>;
   if (!page) return <div className="p-8 text-center text-destructive">Página não encontrada.</div>;
 

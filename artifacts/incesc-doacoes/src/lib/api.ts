@@ -478,10 +478,11 @@ export function usePublishPortalSettings() {
   });
 }
 
-export function useAdminPortalMedia() {
+export function useAdminPortalMedia(enabled = true) {
   return useQuery({
     queryKey: ["admin", "portal", "media"],
     queryFn: () => fetcher<PortalMedia[]>("/admin/portal/media"),
+    enabled,
   });
 }
 
@@ -528,4 +529,3 @@ export function usePublicPortalSettings() {
     queryFn: () => fetcher<PortalSettings>("/public/portal/settings"),
   });
 }
-
