@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "INCESC — Doe e Transforme Vidas"
+description = "Uma landing page responsiva de doações direcionadas para o INCESC, permitindo escolher ações, acompanhar metas, simular uma contribuição e consultar a prestação de contas com proteção de dados."
+version = "1.0.0"
+id = "artifacts/incesc-doacoes"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25856
+
+[services.development]
+run = "pnpm --filter @workspace/incesc-doacoes run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/incesc-doacoes", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/incesc-doacoes/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25856"
+BASE_PATH = "/"

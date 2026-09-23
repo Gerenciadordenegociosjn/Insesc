@@ -1,0 +1,798 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: public
+  - name: account
+  - name: admin
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /public/actions:
+    get:
+      operationId: listPublicActions
+      tags: [public]
+      responses:
+        "200":
+          description: Published donation actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PublicAction" }
+  /public/transparency:
+    get:
+      operationId: listPublicTransparency
+      tags: [public]
+      responses:
+        "200":
+          description: Published accountability summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TransparencySummary" }
+  /public/checkout-status:
+    get:
+      operationId: getCheckoutStatus
+      tags: [public]
+      responses:
+        "200":
+          description: Checkout availability
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutStatus" }
+  /public/donations/create-checkout:
+    post:
+      operationId: createDonationCheckout
+      tags: [public]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DonationCheckoutInput" }
+      responses:
+        "201":
+          description: Stripe-hosted Checkout URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DonationCheckoutResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: Published action not found }
+        "503":
+          description: No approved payment provider
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+  /public/donations/checkout-status/{sessionId}:
+    get:
+      operationId: getDonationCheckoutStatus
+      tags: [public]
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Server-verified Checkout status
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DonationCheckoutStatus" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { description: Donation not found }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+  /me:
+    get:
+      operationId: getMe
+      tags: [account]
+      responses:
+        "200":
+          description: Current authenticated user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /me/donations:
+    get:
+      operationId: listMyDonations
+      tags: [account]
+      responses:
+        "200":
+          description: Confirmed donations owned by current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MyDonation" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      responses:
+        "200":
+          description: Administrative dashboard
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminDashboard" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /admin/storage/uploads/request-url:
+    post:
+      operationId: requestAdminUploadUrl
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadIntentInput" }
+      responses:
+        "200":
+          description: Private upload intent and signed URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadIntentResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /admin/actions:
+    get:
+      operationId: listAdminActions
+      tags: [admin]
+      responses:
+        "200":
+          description: All donation actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminAction" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      operationId: createAdminAction
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActionInput" }
+      responses:
+        "201":
+          description: Created action
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminAction" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /admin/action-options:
+    get:
+      operationId: listAdminActionOptions
+      tags: [admin]
+      responses:
+        "200":
+          description: Safe action choices for expense workflows
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ActionOption" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /admin/actions/{id}:
+    patch:
+      operationId: updateAdminAction
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/UserId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActionUpdate" }
+      responses:
+        "200":
+          description: Updated action
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminAction" }
+  /admin/donations:
+    get:
+      operationId: listAdminDonations
+      tags: [admin]
+      responses:
+        "200":
+          description: Donations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminDonation" }
+  /admin/expenses:
+    get:
+      operationId: listAdminExpenses
+      tags: [admin]
+      responses:
+        "200":
+          description: Expenses and receipt review state
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminExpense" }
+    post:
+      operationId: createAdminExpense
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExpenseInput" }
+      responses:
+        "201":
+          description: Created expense
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminExpense" }
+  /admin/expenses/{id}/review:
+    post:
+      operationId: reviewAdminExpense
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExpenseReviewInput" }
+      responses:
+        "200":
+          description: Reviewed expense
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminExpense" }
+  /admin/expenses/{id}/publish:
+    post:
+      operationId: publishAdminExpense
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "200":
+          description: Published expense
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminExpense" }
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      responses:
+        "200":
+          description: Staff users
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminUser" }
+  /admin/users/{id}/role:
+    patch:
+      operationId: updateAdminUserRole
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/UserId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UserRoleUpdate" }
+      responses:
+        "200":
+          description: Updated staff role
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminUser" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /public/portal/pages/{slug}:
+    get:
+      operationId: getPublicPortalPage
+      tags: [public]
+      parameters:
+        - { name: slug, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Published page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPagePublic" } } } }
+        "404": { description: Page not found }
+  /public/portal/pages:
+    get:
+      operationId: listPublicPortalPages
+      tags: [public]
+      responses:
+        "200": { description: Published custom navigation, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PortalNavItem" } } } } }
+  /public/portal/settings:
+    get:
+      operationId: getPublicPortalSettings
+      tags: [public]
+      responses:
+        "200": { description: Published footer settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettings" } } } }
+  /public/portal/media/{id}:
+    get:
+      operationId: getPublicPortalMedia
+      tags: [public]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "200": { description: Published referenced image }
+        "404": { description: Media not found }
+  /admin/portal/pages:
+    get:
+      operationId: listAdminPortalPages
+      tags: [admin]
+      responses:
+        "200": { description: Portal pages, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PortalPage" } } } } }
+    post:
+      operationId: createAdminPortalPage
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPageInput" } } } }
+      responses:
+        "201": { description: Created page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { description: Slug conflict }
+  /admin/portal/pages/{id}:
+    get:
+      operationId: getAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses: { "200": { description: Portal page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } } }
+    patch:
+      operationId: updateAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPageUpdate" } } } }
+      responses: { "200": { description: Updated page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } }, "409": { description: Version conflict } }
+  /admin/portal/pages/{id}/publish:
+    post:
+      operationId: publishAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpectedVersion" } } } }
+      responses: { "200": { description: Published page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } } }
+  /admin/portal/pages/{id}/unpublish:
+    post:
+      operationId: unpublishAdminPortalPage
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpectedVersion" } } } }
+      responses: { "200": { description: Unpublished page, content: { application/json: { schema: { $ref: "#/components/schemas/PortalPage" } } } } }
+  /admin/portal/settings:
+    get:
+      operationId: getAdminPortalSettings
+      tags: [admin]
+      responses: { "200": { description: Draft and published settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsAdmin" } } } } }
+    patch:
+      operationId: updateAdminPortalSettings
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsUpdate" } } } }
+      responses: { "200": { description: Updated settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsAdmin" } } } } }
+  /admin/portal/settings/publish:
+    post:
+      operationId: publishAdminPortalSettings
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/ExpectedVersion" } } } }
+      responses: { "200": { description: Published settings, content: { application/json: { schema: { $ref: "#/components/schemas/PortalSettingsAdmin" } } } } }
+  /admin/portal/media/upload-url:
+    post:
+      operationId: createAdminPortalMediaUpload
+      tags: [admin]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalMediaUpload" } } } }
+      responses: { "201": { description: Upload URL, content: { application/json: { schema: { $ref: "#/components/schemas/PortalMediaUploadResponse" } } } } }
+  /admin/portal/media/{id}/confirm:
+    post:
+      operationId: confirmAdminPortalMedia
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PortalMediaConfirm" } } } }
+      responses: { "200": { description: Confirmed media } }
+  /admin/portal/media:
+    get:
+      operationId: listAdminPortalMedia
+      tags: [admin]
+      responses: { "200": { description: Media library } }
+  /admin/portal/media/{id}:
+    get:
+      operationId: getAdminPortalMedia
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses: { "200": { description: Media preview } }
+  /admin/audit-logs:
+    get:
+      operationId: listAdminAuditLogs
+      tags: [admin]
+      responses:
+        "200":
+          description: Audit log
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AuditLog" }
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Forbidden:
+      description: Staff role required
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    ServiceUnavailable:
+      description: Payment provider unavailable
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+    PublicAction:
+      type: object
+      required: [id, slug, title, category, publicDescription, goalCents, suggestedAmounts, raisedCents, status]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        category: { type: string }
+        publicDescription: { type: string }
+        goalCents: { type: ["integer", "null"] }
+        suggestedAmounts: { type: array, items: { type: integer } }
+        raisedCents: { type: integer }
+        status: { type: string }
+    TransparencySummary:
+      allOf:
+        - $ref: "#/components/schemas/PublicAction"
+        - type: object
+          required: [paidCents, usedCents, balanceCents, expenses]
+          properties:
+            paidCents: { type: integer }
+            usedCents: { type: integer }
+            balanceCents: { type: integer }
+            expenses:
+              type: array
+              items: { $ref: "#/components/schemas/PublicExpense" }
+    PublicExpense:
+      type: object
+      required: [id, description, category, amountCents, paidAt]
+      properties:
+        id: { type: string, format: uuid }
+        description: { type: string }
+        category: { type: string }
+        amountCents: { type: integer }
+        paidAt: { type: ["string", "null"], format: date-time }
+        publicReceiptPath: { type: ["string", "null"] }
+    CheckoutStatus:
+      type: object
+      required: [available, reason]
+      properties:
+        available: { type: boolean }
+        reason: { type: string }
+    DonationCheckoutInput:
+      type: object
+      required: [actionId, amountCents]
+      properties:
+        actionId: { type: string, format: uuid }
+        amountCents: { type: integer, minimum: 1 }
+        anonymous: { type: boolean, default: true }
+        communicationConsent: { type: boolean, default: false }
+    DonationCheckoutResponse:
+      type: object
+      required: [checkoutUrl, donationId]
+      properties:
+        checkoutUrl: { type: string, format: uri }
+        donationId: { type: string, format: uuid }
+    DonationCheckoutStatus:
+      type: object
+      required: [donationId, paymentStatus, refundedCents, netAmountCents]
+      properties:
+        donationId: { type: string, format: uuid }
+        paymentStatus: { type: string, enum: [pending, paid, failed, refunded] }
+        refundedCents: { type: integer }
+        netAmountCents: { type: integer }
+    Me:
+      type: object
+      required: [userId, role]
+      properties:
+        userId: { type: string }
+        role: { type: string }
+    MyDonation:
+      type: object
+      required: [id, actionId, amountCents, refundedCents, netAmountCents, paymentStatus, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        actionId: { type: string, format: uuid }
+        amountCents: { type: integer }
+        refundedCents: { type: integer }
+        netAmountCents: { type: integer }
+        paymentStatus: { type: string }
+        createdAt: { type: string, format: date-time }
+        paidAt: { type: ["string", "null"], format: date-time }
+    ActionInput:
+      type: object
+      required: [slug, title, category, publicDescription, suggestedAmounts]
+      properties:
+        slug: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        publicDescription: { type: string }
+        internalDescription: { type: ["string", "null"] }
+        goalCents: { type: ["integer", "null"], minimum: 1 }
+        suggestedAmounts: { type: array, items: { type: integer, minimum: 1 } }
+        status: { type: string }
+    ActionUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        slug: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        publicDescription: { type: string }
+        internalDescription: { type: ["string", "null"] }
+        goalCents: { type: ["integer", "null"], minimum: 1 }
+        suggestedAmounts: { type: array, items: { type: integer, minimum: 1 } }
+        status: { type: string }
+    AdminAction:
+      allOf:
+        - $ref: "#/components/schemas/PublicAction"
+        - type: object
+          properties:
+            internalDescription: { type: ["string", "null"] }
+            createdAt: { type: string, format: date-time }
+    ExpenseInput:
+      type: object
+      required: [actionId, category, description, amountCents]
+      properties:
+        actionId: { type: string, format: uuid }
+        category: { type: string }
+        description: { type: string }
+        amountCents: { type: integer, minimum: 1 }
+        paidAt: { type: ["string", "null"], format: date-time }
+        originalReceiptPath: { type: ["string", "null"] }
+        reviewedReceiptPath: { type: ["string", "null"] }
+        publicDescription: { type: ["string", "null"] }
+    ExpenseReviewInput:
+      type: object
+      required: [reviewedReceiptPath, publicDescription, redactedAttestation]
+      additionalProperties: false
+      properties:
+        reviewedReceiptPath: { type: string, minLength: 1 }
+        publicDescription: { type: string, minLength: 1 }
+        redactedAttestation: { type: boolean, enum: [true] }
+    AdminExpense:
+      allOf:
+        - $ref: "#/components/schemas/PublicExpense"
+        - type: object
+          required: [status, actionId]
+          properties:
+            actionId: { type: string, format: uuid }
+            status: { type: string }
+            originalReceiptPath: { type: ["string", "null"] }
+            reviewedReceiptPath: { type: ["string", "null"] }
+    AdminDonation:
+      allOf:
+        - $ref: "#/components/schemas/MyDonation"
+        - type: object
+          properties:
+            donorUserId: { type: ["string", "null"] }
+            gatewayTransactionId: { type: ["string", "null"] }
+    AdminUser:
+      type: object
+      required: [id, role, active]
+      properties:
+        id: { type: string }
+        email: { type: ["string", "null"] }
+        name: { type: ["string", "null"] }
+        role: { type: string }
+        active: { type: boolean }
+    UserRoleUpdate:
+      type: object
+      required: [role]
+      additionalProperties: false
+      properties:
+        role:
+          type: string
+          enum: [unassigned, administrator, financial, content, transparency, auditor, support]
+    UploadIntentInput:
+      type: object
+      required: [name, size, contentType, purpose]
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1, maximum: 26214400 }
+        contentType: { type: string }
+        purpose: { type: string, enum: [original, reviewed] }
+        expenseId: { type: ["string", "null"], format: uuid }
+    UploadIntentResponse:
+      type: object
+      required: [uploadURL, objectPath, purpose]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+        purpose: { type: string, enum: [original, reviewed] }
+        expenseId: { type: ["string", "null"], format: uuid }
+    AuditLog:
+      type: object
+      required: [id, entityType, entityId, action, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: ["string", "null"] }
+        entityType: { type: string }
+        entityId: { type: string }
+        action: { type: string }
+        metadata:
+          oneOf:
+            - $ref: "#/components/schemas/SafeAuditMetadata"
+            - type: "null"
+        createdAt: { type: string, format: date-time }
+    SafeAuditMetadata:
+      type: object
+      additionalProperties: false
+      properties:
+        changedFields: { type: array, items: { type: string } }
+        previousStatus: { type: string }
+        nextStatus: { type: string }
+        from: { type: string }
+        to: { type: string }
+        purpose: { type: string }
+        contentType: { type: string }
+        size: { type: integer }
+    ActionOption:
+      type: object
+      required: [id, title]
+      additionalProperties: false
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+    AdminDashboard:
+      type: object
+      required: [totalRaisedCents, totalDonations, activeActions, completedActions, pendingPayments, receiptsAwaitingReview]
+      properties:
+        totalRaisedCents: { type: integer }
+        totalDonations: { type: integer }
+        activeActions: { type: integer }
+        completedActions: { type: integer }
+        pendingPayments: { type: integer }
+        receiptsAwaitingReview: { type: integer }
+    ExpectedVersion:
+      type: object
+      required: [expectedVersion]
+      additionalProperties: false
+      properties: { expectedVersion: { type: integer, minimum: 1 } }
+    PortalBlock:
+      type: object
+      required: [id, type]
+      additionalProperties: true
+      properties:
+        id: { type: string, minLength: 1 }
+        type: { type: string, enum: [hero, banner, text, image, split, cards, gallery, system] }
+    PortalPageInput:
+      type: object
+      required: [slug, title, blocks]
+      additionalProperties: false
+      properties:
+        slug: { type: string, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+        title: { type: string, minLength: 1 }
+        blocks: { type: array, items: { $ref: "#/components/schemas/PortalBlock" } }
+    PortalPageUpdate:
+      allOf:
+        - $ref: "#/components/schemas/PortalPageInput"
+        - $ref: "#/components/schemas/ExpectedVersion"
+      description: Fields may be omitted except expectedVersion.
+    PortalPage:
+      type: object
+      required: [id, slug, title, blocks, status, version]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        blocks: { type: array, items: { $ref: "#/components/schemas/PortalBlock" } }
+        status: { type: string, enum: [draft, published] }
+        version: { type: integer }
+        publishedAt: { type: ["string", "null"], format: date-time }
+    PortalPagePublic:
+      allOf:
+        - $ref: "#/components/schemas/PortalPage"
+        - type: object
+          properties:
+            media: { type: array, items: { $ref: "#/components/schemas/PortalMediaPublic" } }
+    PortalNavItem:
+      type: object
+      required: [id, slug, title]
+      properties: { id: { type: string, format: uuid }, slug: { type: string }, title: { type: string } }
+    PortalSettings:
+      type: object
+      required: [footerInstitutional, officialLinks, contact]
+      properties:
+        footerInstitutional: { type: string }
+        officialLinks: { type: array, items: { type: object, required: [label, href], properties: { label: { type: string }, href: { type: string } } } }
+        contact: { type: object, additionalProperties: { type: string } }
+    PortalSettingsUpdate:
+      type: object
+      required: [draft, expectedVersion]
+      additionalProperties: false
+      properties:
+        draft: { $ref: "#/components/schemas/PortalSettings" }
+        expectedVersion: { type: integer, minimum: 1 }
+    PortalSettingsAdmin:
+      type: object
+      required: [draft, published, version]
+      properties:
+        draft: { $ref: "#/components/schemas/PortalSettings" }
+        published: { anyOf: [{ $ref: "#/components/schemas/PortalSettings" }, { type: "null" }] }
+        version: { type: integer }
+    PortalMediaUpload:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string }
+        size: { type: integer, minimum: 1, maximum: 8388608 }
+        contentType: { type: string, enum: [image/png, image/jpeg, image/webp] }
+    PortalMediaUploadResponse:
+      type: object
+      required: [id, uploadURL]
+      properties: { id: { type: string, format: uuid }, uploadURL: { type: string, format: uri } }
+    PortalMediaConfirm:
+      type: object
+      required: [altText]
+      properties: { altText: { type: string, minLength: 1 } }
+    PortalMediaPublic:
+      type: object
+      required: [id, altText, contentType, url]
+      properties:
+        id: { type: string, format: uuid }
+        altText: { type: string }
+        contentType: { type: string }
+        url: { type: string }
+
