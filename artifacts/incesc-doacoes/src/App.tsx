@@ -7,6 +7,17 @@ import NotFound from '@/pages/not-found';
 import Home from '@/pages/home';
 import Transparencia from '@/pages/transparencia';
 import MinhaJornada from '@/pages/minha-jornada';
+import SignInPage from '@/pages/sign-in';
+import SignUpPage from '@/pages/sign-up';
+import AdminDashboard from '@/pages/admin/dashboard';
+import AdminActions from '@/pages/admin/actions';
+import AdminDonations from '@/pages/admin/donations';
+import AdminExpenses from '@/pages/admin/expenses';
+import AdminUsers from '@/pages/admin/users';
+import AdminAuditLogs from '@/pages/admin/audit';
+import AdminLayout from '@/components/admin-layout';
+import { ClerkProvider } from '@clerk/react';
+import { publishableKeyFromHost } from '@clerk/react/internal';
 import {
   Route,
   Switch,
@@ -15,6 +26,17 @@ import {
 } from 'wouter';
 
 const queryClient = new QueryClient();
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+const clerkPubKey = publishableKeyFromHost(
+  window.location.hostname,
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+);
+
+function stripBase(path: string) {
+  return basePath && path.startsWith(basePath)
+    ? path.slice(basePath.length) || '/'
+    : path;
+}
 
 function Router() {
   const [location] = useLocation();
@@ -57,6 +79,38 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/transparencia" component={Transparencia} />
         <Route path="/minha-jornada" component={MinhaJornada} />
+        <Route path="/sign-in/*?" component={SignInPage} />
+        <Route path="/sign-up/*?" component={SignUpPage} />
+        <Route path="/admin">
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin/actions">
+          <AdminLayout>
+            <AdminActions />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin/donations">
+          <AdminLayout>
+            <AdminDonations />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin/expenses">
+          <AdminLayout>
+            <AdminExpenses />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin/users">
+          <AdminLayout>
+            <AdminUsers />
+          </AdminLayout>
+        </Route>
+        <Route path="/admin/audit-logs">
+          <AdminLayout>
+            <AdminAuditLogs />
+          </AdminLayout>
+        </Route>
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
@@ -72,12 +126,40 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
+        <WouterRouter base={basePath}>
+          <ClerkRouterBridge />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
+  );
+}
+
+function ClerkRouterBridge() {
+  const [, navigate] = useLocation();
+
+  if (!clerkPubKey) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background text-foreground p-4 text-center">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">Clerk não configurado</h1>
+          <p>A chave pública do Clerk (VITE_CLERK_PUBLISHABLE_KEY) está ausente.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      proxyUrl={import.meta.env.VITE_CLERK_PROXY_URL}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
+      routerPush={(to) => navigate(stripBase(to))}
+      routerReplace={(to) => navigate(stripBase(to), { replace: true })}
+    >
+      <Router />
+    </ClerkProvider>
   );
 }
 

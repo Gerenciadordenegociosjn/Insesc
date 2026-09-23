@@ -1,79 +1,130 @@
-import { ArrowUpRight, FileText, LockKeyhole, ShieldCheck } from "lucide-react";
-import { InteriorLayout } from "@/components/interior-layout";
-
-const officialLinks = [
-  {
-    title: "Transparência institucional",
-    description: "Consulte as informações divulgadas diretamente pelo INCESC em seu portal oficial.",
-    href: "https://www.incesc.org.br/transparencia",
-    testId: "link-official-transparency",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Documentos institucionais",
-    description: "Acesse os documentos publicados pelo instituto em seu próprio site.",
-    href: "https://www.incesc.org.br/documentos",
-    testId: "link-official-documents",
-    icon: FileText,
-  },
-  {
-    title: "Política de privacidade",
-    description: "Entenda como o instituto apresenta suas diretrizes de privacidade.",
-    href: "https://www.incesc.org.br/politica-de-privacidade",
-    testId: "link-official-privacy",
-    icon: LockKeyhole,
-  },
-];
+import { SiteHeader } from "@/components/site-header";
+import { Link } from "wouter";
+import { useTransparency } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { ShieldCheck, FileText, ArrowLeft, ExternalLink, Calendar } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import logoUrl from "@/assets/logo.png";
 
 export default function Transparencia() {
+  const { data: transparencyData = [], isLoading } = useTransparency();
+
+  const formatCurrency = (val: number) => 
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val / 100);
+
   return (
-    <InteriorLayout
-      eyebrow="Prestação de contas"
-      title="Portal da transparência"
-      description="Um espaço para acompanhar informações oficiais do INCESC e encontrar as fontes institucionais de prestação de contas."
-    >
-      <section className="px-4 pb-16 pt-4 sm:pb-24">
-        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_1.35fr] lg:gap-16">
-          <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-secondary">Compromisso com a clareza</p>
-            <h2 className="text-3xl font-black leading-tight sm:text-4xl">Transparência exige informações verificáveis.</h2>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              Esta página reúne caminhos para consultar documentos e informações publicados pelo próprio instituto. Registros específicos de campanhas, despesas ou comprovantes não estão integrados a este site de doações.
-            </p>
-            <div data-testid="status-campaign-records" className="mt-8 rounded-2xl border border-border bg-muted/60 p-6">
-              <p className="mb-2 font-bold text-foreground">Registros de campanhas neste portal</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                Ainda não disponíveis aqui. Nenhum valor arrecadado, despesa, comprovante ou beneficiário é exibido sem documentação oficial validada e proteção dos dados pessoais.
-              </p>
-            </div>
+    <div className="min-h-screen bg-background font-sans">
+      <SiteHeader />
+      
+      <main className="py-16 lg:py-24">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="mb-8">
+            <Link href="/">
+              <Button variant="ghost" className="gap-2 -ml-4 text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-4 h-4" />
+                Voltar
+              </Button>
+            </Link>
           </div>
-          <div>
-            <h2 className="mb-5 text-xl font-black">Fontes oficiais do INCESC</h2>
-            <div className="space-y-3">
-              {officialLinks.map(({ title, description, href, icon: Icon, testId }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-testid={testId}
-                  className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm transition-colors hover:border-primary"
-                >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary"><Icon aria-hidden="true" className="h-5 w-5" /></span>
-                  <span className="flex-1">
-                    <span className="block font-bold text-foreground">{title}</span>
-                    <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{description}</span>
-                  </span>
-                  <ArrowUpRight aria-hidden="true" className="h-5 w-5 shrink-0 text-primary" />
-                </a>
+
+          <header className="mb-16 text-center">
+            <ShieldCheck className="w-16 h-16 text-secondary mx-auto mb-6" />
+            <h1 className="text-4xl lg:text-5xl font-black mb-6">Portal da Transparência</h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Acompanhe o destino dos recursos arrecadados e as despesas aprovadas de cada iniciativa. 
+              Nosso compromisso é com a clareza e a responsabilidade.
+            </p>
+          </header>
+
+          {isLoading ? (
+            <div className="space-y-6">
+              {[1, 2].map(i => (
+                <div key={i} className="h-64 bg-card rounded-3xl animate-pulse border border-border" />
               ))}
             </div>
-            <p className="mt-5 text-sm text-muted-foreground">
-              Canal de atendimento: <a className="font-semibold text-primary underline-offset-4 hover:underline" href="tel:+556241015303">+55 (62) 4101-5303</a>
-            </p>
-          </div>
+          ) : transparencyData.length > 0 ? (
+            <div className="space-y-12">
+              {transparencyData.map(summary => (
+                <section key={summary.id} className="bg-card rounded-3xl border border-border overflow-hidden">
+                  <div className="p-8 border-b border-border bg-muted/20">
+                    <h2 className="text-2xl font-black mb-6">{summary.title}</h2>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="bg-background p-4 rounded-2xl border border-border">
+                        <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Arrecadado</p>
+                        <p className="text-2xl font-black text-primary">{formatCurrency(summary.paidCents)}</p>
+                      </div>
+                      <div className="bg-background p-4 rounded-2xl border border-border">
+                        <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Investido</p>
+                        <p className="text-2xl font-black text-secondary">{formatCurrency(summary.usedCents)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-8">
+                    <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-muted-foreground" />
+                      Despesas Aprovadas
+                    </h3>
+                    
+                    {summary.expenses.length > 0 ? (
+                      <div className="space-y-4">
+                        {summary.expenses.map(expense => (
+                          <div key={expense.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl bg-muted/40 border border-border gap-4">
+                            <div>
+                              <p className="font-bold text-lg mb-1">{expense.description}</p>
+                              <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                                <Calendar className="w-4 h-4" />
+                                {expense.paidAt ? format(new Date(expense.paidAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : "Não paga"}
+                              </p>
+                            </div>
+                            <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 w-full sm:w-auto">
+                              <span className="font-black text-lg">{formatCurrency(expense.amountCents)}</span>
+                              {expense.publicReceiptPath && (
+                                <a 
+                                  href={expense.publicReceiptPath} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-sm font-bold text-secondary hover:underline flex items-center gap-1"
+                                >
+                                  Ver comprovante
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-10 bg-muted/20 rounded-2xl border border-dashed border-border">
+                        <p className="text-muted-foreground">Nenhuma despesa foi aprovada e publicada para esta ação até o momento.</p>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-card rounded-3xl border border-border border-dashed px-4">
+              <ShieldCheck className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+              <h2 className="text-xl font-bold mb-2">Sem registros financeiros públicos</h2>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Não há dados financeiros consolidados disponíveis no momento. As informações serão publicadas aqui de forma transparente à medida que os recursos forem arrecadados e investidos nos projetos.
+              </p>
+            </div>
+          )}
         </div>
-      </section>
-    </InteriorLayout>
+      </main>
+
+      <footer className="bg-muted py-12 text-center border-t border-border mt-auto">
+        <div className="container mx-auto px-4">
+          <img src={logoUrl} alt="INCESC" className="h-8 w-auto object-contain mx-auto mb-6 opacity-80" />
+          <p className="text-xs text-muted-foreground max-w-md mx-auto">
+             Instituto INCESC · CNPJ 49.637.563/0001-84<br/>
+             Consulte também nossos <a href="https://www.incesc.org.br/documentos" className="underline hover:text-foreground">documentos oficiais</a>.
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 }

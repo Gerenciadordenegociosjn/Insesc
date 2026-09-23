@@ -10,6 +10,9 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: public
+  - name: account
+  - name: admin
 paths:
   /healthz:
     get:
@@ -24,7 +27,291 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /public/actions:
+    get:
+      operationId: listPublicActions
+      tags: [public]
+      responses:
+        "200":
+          description: Published donation actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PublicAction" }
+  /public/transparency:
+    get:
+      operationId: listPublicTransparency
+      tags: [public]
+      responses:
+        "200":
+          description: Published accountability summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TransparencySummary" }
+  /public/checkout-status:
+    get:
+      operationId: getCheckoutStatus
+      tags: [public]
+      responses:
+        "200":
+          description: Checkout availability
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutStatus" }
+  /public/donations/create-checkout:
+    post:
+      operationId: createDonationCheckout
+      tags: [public]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DonationCheckoutInput" }
+      responses:
+        "503":
+          description: No approved payment provider
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+  /me:
+    get:
+      operationId: getMe
+      tags: [account]
+      responses:
+        "200":
+          description: Current authenticated user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /me/donations:
+    get:
+      operationId: listMyDonations
+      tags: [account]
+      responses:
+        "200":
+          description: Confirmed donations owned by current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MyDonation" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /admin/dashboard:
+    get:
+      operationId: getAdminDashboard
+      tags: [admin]
+      responses:
+        "200":
+          description: Administrative dashboard
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminDashboard" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /admin/storage/uploads/request-url:
+    post:
+      operationId: requestAdminUploadUrl
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadIntentInput" }
+      responses:
+        "200":
+          description: Private upload intent and signed URL
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadIntentResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /admin/actions:
+    get:
+      operationId: listAdminActions
+      tags: [admin]
+      responses:
+        "200":
+          description: All donation actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminAction" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      operationId: createAdminAction
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActionInput" }
+      responses:
+        "201":
+          description: Created action
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminAction" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /admin/actions/{id}:
+    patch:
+      operationId: updateAdminAction
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/UserId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActionUpdate" }
+      responses:
+        "200":
+          description: Updated action
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminAction" }
+  /admin/donations:
+    get:
+      operationId: listAdminDonations
+      tags: [admin]
+      responses:
+        "200":
+          description: Donations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminDonation" }
+  /admin/expenses:
+    get:
+      operationId: listAdminExpenses
+      tags: [admin]
+      responses:
+        "200":
+          description: Expenses and receipt review state
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminExpense" }
+    post:
+      operationId: createAdminExpense
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExpenseInput" }
+      responses:
+        "201":
+          description: Created expense
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminExpense" }
+  /admin/expenses/{id}/review:
+    post:
+      operationId: reviewAdminExpense
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExpenseReviewInput" }
+      responses:
+        "200":
+          description: Reviewed expense
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminExpense" }
+  /admin/expenses/{id}/publish:
+    post:
+      operationId: publishAdminExpense
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "200":
+          description: Published expense
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminExpense" }
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      responses:
+        "200":
+          description: Staff users
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminUser" }
+  /admin/users/{id}/role:
+    patch:
+      operationId: updateAdminUserRole
+      tags: [admin]
+      parameters:
+        - { $ref: "#/components/parameters/UserId" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UserRoleUpdate" }
+      responses:
+        "200":
+          description: Updated staff role
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminUser" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /admin/audit-logs:
+    get:
+      operationId: listAdminAuditLogs
+      tags: [admin]
+      responses:
+        "200":
+          description: Audit log
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AuditLog" }
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Forbidden:
+      description: Staff role required
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +320,197 @@ components:
           type: string
       required:
         - status
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+    PublicAction:
+      type: object
+      required: [id, slug, title, category, publicDescription, goalCents, suggestedAmounts, raisedCents, status]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        title: { type: string }
+        category: { type: string }
+        publicDescription: { type: string }
+        goalCents: { type: ["integer", "null"] }
+        suggestedAmounts: { type: array, items: { type: integer } }
+        raisedCents: { type: integer }
+        status: { type: string }
+    TransparencySummary:
+      allOf:
+        - $ref: "#/components/schemas/PublicAction"
+        - type: object
+          required: [paidCents, usedCents, balanceCents, expenses]
+          properties:
+            paidCents: { type: integer }
+            usedCents: { type: integer }
+            balanceCents: { type: integer }
+            expenses:
+              type: array
+              items: { $ref: "#/components/schemas/PublicExpense" }
+    PublicExpense:
+      type: object
+      required: [id, description, category, amountCents, paidAt]
+      properties:
+        id: { type: string, format: uuid }
+        description: { type: string }
+        category: { type: string }
+        amountCents: { type: integer }
+        paidAt: { type: ["string", "null"], format: date-time }
+        publicReceiptPath: { type: ["string", "null"] }
+    CheckoutStatus:
+      type: object
+      required: [available, reason]
+      properties:
+        available: { type: boolean }
+        reason: { type: string }
+    DonationCheckoutInput:
+      type: object
+      required: [actionId, amountCents]
+      properties:
+        actionId: { type: string, format: uuid }
+        amountCents: { type: integer, minimum: 1 }
+        anonymous: { type: boolean, default: true }
+        communicationConsent: { type: boolean, default: false }
+    Me:
+      type: object
+      required: [userId, role]
+      properties:
+        userId: { type: string }
+        role: { type: string }
+    MyDonation:
+      type: object
+      required: [id, actionId, amountCents, paymentStatus, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        actionId: { type: string, format: uuid }
+        amountCents: { type: integer }
+        paymentStatus: { type: string }
+        createdAt: { type: string, format: date-time }
+        paidAt: { type: ["string", "null"], format: date-time }
+    ActionInput:
+      type: object
+      required: [slug, title, category, publicDescription, suggestedAmounts]
+      properties:
+        slug: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        publicDescription: { type: string }
+        internalDescription: { type: ["string", "null"] }
+        goalCents: { type: ["integer", "null"], minimum: 1 }
+        suggestedAmounts: { type: array, items: { type: integer, minimum: 1 } }
+        status: { type: string }
+    ActionUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        slug: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        publicDescription: { type: string }
+        internalDescription: { type: ["string", "null"] }
+        goalCents: { type: ["integer", "null"], minimum: 1 }
+        suggestedAmounts: { type: array, items: { type: integer, minimum: 1 } }
+        status: { type: string }
+    AdminAction:
+      allOf:
+        - $ref: "#/components/schemas/PublicAction"
+        - type: object
+          properties:
+            internalDescription: { type: ["string", "null"] }
+            createdAt: { type: string, format: date-time }
+    ExpenseInput:
+      type: object
+      required: [actionId, category, description, amountCents]
+      properties:
+        actionId: { type: string, format: uuid }
+        category: { type: string }
+        description: { type: string }
+        amountCents: { type: integer, minimum: 1 }
+        paidAt: { type: ["string", "null"], format: date-time }
+        originalReceiptPath: { type: ["string", "null"] }
+        reviewedReceiptPath: { type: ["string", "null"] }
+        publicDescription: { type: ["string", "null"] }
+    ExpenseReviewInput:
+      type: object
+      required: [reviewedReceiptPath, publicDescription, redactedAttestation]
+      additionalProperties: false
+      properties:
+        reviewedReceiptPath: { type: string, minLength: 1 }
+        publicDescription: { type: string, minLength: 1 }
+        redactedAttestation: { type: boolean, enum: [true] }
+    AdminExpense:
+      allOf:
+        - $ref: "#/components/schemas/PublicExpense"
+        - type: object
+          required: [status, actionId]
+          properties:
+            actionId: { type: string, format: uuid }
+            status: { type: string }
+            originalReceiptPath: { type: ["string", "null"] }
+            reviewedReceiptPath: { type: ["string", "null"] }
+    AdminDonation:
+      allOf:
+        - $ref: "#/components/schemas/MyDonation"
+        - type: object
+          properties:
+            donorUserId: { type: ["string", "null"] }
+            gatewayTransactionId: { type: ["string", "null"] }
+    AdminUser:
+      type: object
+      required: [id, role, active]
+      properties:
+        id: { type: string }
+        email: { type: ["string", "null"] }
+        name: { type: ["string", "null"] }
+        role: { type: string }
+        active: { type: boolean }
+    UserRoleUpdate:
+      type: object
+      required: [role]
+      additionalProperties: false
+      properties:
+        role:
+          type: string
+          enum: [unassigned, administrator, financial, content, transparency, auditor, support]
+    UploadIntentInput:
+      type: object
+      required: [name, size, contentType, purpose]
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1, maximum: 26214400 }
+        contentType: { type: string }
+        purpose: { type: string, enum: [original, reviewed] }
+        expenseId: { type: ["string", "null"], format: uuid }
+    UploadIntentResponse:
+      type: object
+      required: [uploadURL, objectPath, purpose]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+        purpose: { type: string, enum: [original, reviewed] }
+        expenseId: { type: ["string", "null"], format: uuid }
+    AuditLog:
+      type: object
+      required: [id, entityType, entityId, action, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: ["string", "null"] }
+        entityType: { type: string }
+        entityId: { type: string }
+        action: { type: string }
+        createdAt: { type: string, format: date-time }
+    AdminDashboard:
+      type: object
+      required: [totalRaisedCents, totalDonations, activeActions, completedActions, pendingPayments, receiptsAwaitingReview]
+      properties:
+        totalRaisedCents: { type: integer }
+        totalDonations: { type: integer }
+        activeActions: { type: integer }
+        completedActions: { type: integer }
+        pendingPayments: { type: integer }
+        receiptsAwaitingReview: { type: integer }
 
