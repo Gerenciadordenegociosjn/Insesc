@@ -1,3 +1,4 @@
 - [Stripe connector payment confirmation](stripe-connector-confirmation.md) — proxy-only Stripe connections need server reconciliation instead of assuming webhook credentials exist.
 - [Immutable CMS media](cms-media-immutability.md) — a verified upload can still be overwritten through its live signed URL; publish only copied media.
 - [Portal safety checks](portal-safety-checks.md) — publication checks must use a disposable database and synthetic in-memory images, never the shared preview.
+- [GitHub publishing through connectors](github-publishing.md) — connector API access and Git push credentials can disagree; verify snapshots by Git tree hash.
